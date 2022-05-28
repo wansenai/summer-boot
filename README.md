@@ -1,5 +1,7 @@
 # Summer Boot
 
+The structure and features of this framework are currently being conceived
+
 ```rust
 #[SummerBootApplication]
 async fn main() {
