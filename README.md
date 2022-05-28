@@ -1,7 +1,10 @@
 # Summer Boot
 
-The structure and features of this framework are currently being conceived
+The next generation decentralized web framework allows users to manage and share their own data. 
 
+It will be a wide area and cross regional web.
+
+## API Example Show
 ```rust
 #[web3]
 #[SummerBootApplication]
@@ -10,12 +13,10 @@ async fn main() {
 }
 ```
 
-api:
-
 ```rust
 #[ResutController]
 #[RequestMapping("api")]
 async fn trait {
-
+    // do something
 }
 ```
