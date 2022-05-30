@@ -16,7 +16,7 @@ async fn main() {
 ```rust
 #[ResutController]
 #[RequestMapping("api")]
-async fn trait {
+async trait Api{
     // do something
 }
 ```
