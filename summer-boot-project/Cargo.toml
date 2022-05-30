@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "summer-boot",
+    "summer-boot-actuator",
+    "summer-boot-autoconfigure",
+    "summer-boot-tools",
+]

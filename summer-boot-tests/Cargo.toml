@@ -1,0 +1,10 @@
+[package]
+name = "summer-boot-tests"
+version = "0.1.0"
+rust-version = "1.60.0"
+edition = "2021"
+description = "summer boot test"
+authors = [
+    "James Zow <Jameszow@163.com>"
+]
+license = "Apache-2.0"
