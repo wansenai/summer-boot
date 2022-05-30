@@ -1,1 +1,12 @@
+[package]
+name = "core"
+version = "0.1.0"
+description = "boot core"
+license = "Apache-2.0"
+edition = "2021"
+authors = [
+    "Jmaes Zow <Jameszow@163.com>"
+]
 
+[dependencies]
+serde = "1"
