@@ -7,13 +7,13 @@ enum ClientAuth {
      */
     NONE,
     /**
-	 * Client authentication is wanted but not mandatory.
-	 */
-	WANT,
-	/**
-	 * Client authentication is needed and mandatory.
-	 */
-	NEED
+     * Client authentication is wanted but not mandatory.
+     */
+    WANT,
+    /**
+     * Client authentication is needed and mandatory.
+     */
+    NEED,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
