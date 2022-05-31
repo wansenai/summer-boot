@@ -18,7 +18,6 @@ enum ClientAuth {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Ssl {
-
     enabled: Option<bool>,
 
     ciphers: Vec<String>,
@@ -57,27 +56,26 @@ pub struct Ssl {
 }
 
 impl Ssl {
-
     pub(crate) fn new(ssl_config: Ssl) -> Self {
         Ssl {
-            enabled:                            Some(true),
-            protocol:                           Some(String::from("TLS")),
-            ciphers:                            ssl_config.ciphers,
-            client_auth:                        ssl_config.client_auth,
-            enabled_protocols:                  ssl_config.enabled_protocols,
-            key_alias:                          ssl_config.key_alias,
-            key_passowrd:                       ssl_config.key_passowrd,
-            key_store:                          ssl_config.key_store,                      
-            key_store_password:                 ssl_config.key_store_password,
-            key_store_type:                     ssl_config.key_store_type,
-            trust_store:                        ssl_config.trust_store,
-            trust_store_password:               ssl_config.trust_store_password,
-            trust_store_type:                   ssl_config.trust_store_type,
-            trust_store_provider:               ssl_config.trust_store_provider,
-            certificate:                        ssl_config.certificate,
-            certificate_private_key:            ssl_config.certificate_private_key,
-            trust_certificate:                  ssl_config.trust_certificate,
-            trust_certificate_private_key:      ssl_config.trust_certificate_private_key,
+            enabled: Some(true),
+            protocol: Some(String::from("TLS")),
+            ciphers: ssl_config.ciphers,
+            client_auth: ssl_config.client_auth,
+            enabled_protocols: ssl_config.enabled_protocols,
+            key_alias: ssl_config.key_alias,
+            key_passowrd: ssl_config.key_passowrd,
+            key_store: ssl_config.key_store,
+            key_store_password: ssl_config.key_store_password,
+            key_store_type: ssl_config.key_store_type,
+            trust_store: ssl_config.trust_store,
+            trust_store_password: ssl_config.trust_store_password,
+            trust_store_type: ssl_config.trust_store_type,
+            trust_store_provider: ssl_config.trust_store_provider,
+            certificate: ssl_config.certificate,
+            certificate_private_key: ssl_config.certificate_private_key,
+            trust_certificate: ssl_config.trust_certificate,
+            trust_certificate_private_key: ssl_config.trust_certificate_private_key,
         }
     }
 }
@@ -91,8 +89,8 @@ mod tests {
         let ssl_config = Ssl {
             enabled: Some(false),
             protocol: Some(String::from("TLS")),
-            ciphers:  Vec::new(),
-            client_auth:  ClientAuth::NONE,
+            ciphers: Vec::new(),
+            client_auth: ClientAuth::NONE,
             enabled_protocols: Vec::new(),
             key_alias: None,
             key_passowrd: None,
