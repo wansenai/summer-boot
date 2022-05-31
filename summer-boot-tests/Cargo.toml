@@ -1,5 +1,5 @@
 [package]
-name = "summer-boot-tests"
+name = "summer-boot-parent"
 version = "0.1.0"
 rust-version = "1.60.0"
 edition = "2021"
