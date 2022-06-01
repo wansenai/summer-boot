@@ -1,7 +1,5 @@
 use std::{
-    any::Any,
-    cmp, fmt, io,
-    marker::PhantomData,
+    cmp, io,
     net,
     sync::{Arc, Mutex},
     time::Duration,
@@ -16,8 +14,8 @@ struct Config {
 }
 
 pub struct SummerApplication {
-    config: Arc<Mutex<Config>>,
-    backlog: u32,
+    // config: Arc<Mutex<Config>>,
+    pub backlog: u32,
 }
 
 impl SummerApplication {
@@ -67,3 +65,4 @@ fn create_tcp_listener(address: net::SocketAddr, backlog: u32) -> io::Result<net
     socket.listen(backlog).unwrap();
     Ok(net::TcpListener::from(socket))
 }
+
