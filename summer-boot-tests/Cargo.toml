@@ -8,3 +8,6 @@ authors = [
     "James Zow <Jameszow@163.com>"
 ]
 license = "Apache-2.0"
+
+[dependencies]
+summer-boot = {version = "0.1.0", path = "../summer-boot"}
