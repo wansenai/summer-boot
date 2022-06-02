@@ -86,6 +86,8 @@ pub fn load_conf() -> Option<GlobalConfig> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use summer_boot::web::server::server;
+  
     #[test]
     fn test_load_env_conf_mysql() {
         let pro = load_conf();
@@ -93,6 +95,15 @@ mod tests {
         pro.as_ref().map(|a| {
             println!("mysqlConfig:{}", serde_json::to_string(&a.mysql).unwrap());
         });
+    }
+
+    #[test]
+    fn test_socket() {
+        let sa = server::SummerApplication {
+            backlog: 5,
+        };
+
+        server::SummerApplication::run(sa, "127.0.0.1:8080");
     }
 }
 
