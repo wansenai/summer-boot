@@ -1,0 +1,7 @@
+status = [
+    '%' # All checks must pass before merging into master
+]
+delete_merged_branches = false
+use_squash_merge = true
+timeout_sec = 9600
+required_approvals = 1
