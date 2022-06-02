@@ -8,3 +8,10 @@ authors = [
     "James Zow <Jameszow@163.com>"
 ]
 license = "Apache-2.0"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.8"
+serde_json = "1.0.75"
+lazy_static = "1.4.0"
+schemars = "0.8.8"
