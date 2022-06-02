@@ -35,7 +35,7 @@ pub struct EnvConfig {
  */
 pub fn load_env_conf() -> Option<EnvConfig> {
 
-    let path = format!("/work/rust_catalogue/summer-boot/summer-boot-tests/src/resources/app.yml");
+    let path = format!("src/resources/app.yml");
     let schema = yaml_from_str::<RootSchema>(
         &read_to_string(&path).unwrap_or_else(|_| panic!("Error loading configuration file {}, please check the configuration!", &path)),
     );
@@ -57,7 +57,7 @@ pub fn load_env_conf() -> Option<EnvConfig> {
 action  dev 开始环境 test 测试环境 prod 生产环境
  */
 pub fn load_global_config(action: String) -> Option<GlobalConfig> {
-    let path = format!("/work/rust_catalogue/summer-boot/summer-boot-tests/src/resources/app-{}.yml", &action);
+    let path = format!("src/resources/app-{}.yml", &action);
     let schema = yaml_from_str::<RootSchema>(
         &read_to_string(&path).unwrap_or_else(|_| panic!("Error loading configuration file {}, please check the configuration!", &path)),
     );
