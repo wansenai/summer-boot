@@ -3,6 +3,7 @@ use schemars::schema::RootSchema;
 use serde_yaml::from_str as yaml_from_str;
 use serde_json::{from_str as json_from_str, to_string_pretty};
 use std::fs::read_to_string;
+use tokio::net::TcpListener;
 #[derive(Serialize, Deserialize,Debug)]
 pub struct GlobalConfig {
     pub mysql: Mysql,
@@ -86,7 +87,7 @@ pub fn load_conf() -> Option<GlobalConfig> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use summer_boot::web::server::server;
+    use summer_boot::web2::server::server;
   
     #[test]
     fn test_load_env_conf_mysql() {
@@ -97,13 +98,28 @@ mod tests {
         });
     }
 
-    #[test]
-    fn test_socket() {
-        let sa = server::SummerApplication {
-            backlog: 5,
-        };
+    #[tokio::test]
+    async fn test_socket() {
 
-        server::SummerApplication::run(sa, "127.0.0.1:8080");
+        // let addrs = "127.0.0.1:1337".parse().unwrap();
+
+        // let sa = server::SummerApplication {
+        //     backlog: 5,
+        //     listener: TcpListener::try_into(self),
+        //     addr: addrs,
+        //     sleep_on_errors: true,
+        //     tcp_keepalive_timeout: None,
+        //     tcp_nodelay: false,
+        //     timeout: None,
+        // };
+
+        // server::SummerApplication::run(sa, "127.0.0.1:8080").unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_socket_two() {
+        let addrs = "127.0.0.1:8081".parse().unwrap();
+        server::SummerApplication::bind_two(&addrs);
     }
 }
 

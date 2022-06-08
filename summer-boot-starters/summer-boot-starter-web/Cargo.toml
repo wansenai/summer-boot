@@ -8,3 +8,5 @@ authors = [
     "James Zow <Jameszow@163.com>"
 ]
 license = "Apache-2.0"
+
+[dependencies]
