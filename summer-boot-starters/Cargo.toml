@@ -1,9 +1,0 @@
-[workspace]
-members = [
-    "summer-boot-starter-aop",
-    "summer-boot-starter-jdbc",
-    "summer-boot-starter-pulsar",
-    "summer-boot-starter-redis",
-    "summer-boot-starter-vm",
-    "summer-boot-starter-web",
-]
