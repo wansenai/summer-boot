@@ -23,7 +23,6 @@ use quote::quote;
 /// ```
 #[proc_macro_attribute]
 pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
-    todo!("检测item格式是否正确");
 
     let mut input = syn::parse_macro_input!(item as syn::ItemFn);
     let attrs = &input.attrs;
