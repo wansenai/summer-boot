@@ -1,10 +1,10 @@
-//! The `Accept` trait and supporting types.
+//! `Accept` trait 和支持的类型。
+//! 
+//! 这个模块包含:
 //!
-//! This module contains:
-//!
-//! - The [`Accept`](Accept) trait used to asynchronously accept incoming
-//!   connections.
-//! - Utilities like `poll_fn` to ease creating a custom `Accept`.
+//! - 用于异步接受传入数据的 [`Accept`](Accept) feture。
+//!   链接.
+//! - 像 `poll_fn` 这样的程序可以创建自定义的 `Accept`.
 
 #[cfg(feature = "stream")]
 use futures_core::Stream;
@@ -16,22 +16,21 @@ use crate::common::{
     Pin,
 };
 
-/// Asynchronously accept incoming connections.
+/// 异步接受传入连接。
 pub trait Accept {
-    /// The connection type that can be accepted.
+    /// 可以接受的连接类型。
     type Conn;
-    /// The error type that can occur when accepting a connection.
+    /// 接受连接时可能发生的错误类型。
     type Error;
 
-    /// Poll to accept the next connection.
+    /// 轮询接受下一个连接。
     fn poll_accept(
         self: Pin<&mut Self>,
         cx: &mut task::Context<'_>,
     ) -> Poll<Option<Result<Self::Conn, Self::Error>>>;
 }
 
-/// Create an `Accept` with a polling function.
-///
+/// 使用轮询函数创建一个 `Accept` 。
 /// # Example
 ///
 /// ```
@@ -39,15 +38,15 @@ pub trait Accept {
 /// use hyper::server::{accept, Server};
 ///
 /// # let mock_conn = ();
-/// // If we created some mocked connection...
+/// // 如果创建一个mock链接...
 /// let mut conn = Some(mock_conn);
 ///
-/// // And accept just the mocked conn once...
+/// // 只接受mock链接一次...
 /// let once = accept::poll_fn(move |cx| {
 ///     Poll::Ready(conn.take().map(Ok::<_, ()>))
 /// });
 ///
-/// let builder = Server::builder(once);
+/// let builder = summer_bot::Server::builder(once);
 /// ```
 pub fn poll_fn<F, IO, E>(func: F) -> impl Accept<Conn = IO, Error = E>
 where
@@ -55,7 +54,7 @@ where
 {
     struct PollFn<F>(F);
 
-    // The closure `F` is never pinned
+    // 闭包 `F` 是不固定的
     impl<F> Unpin for PollFn<F> {}
 
     impl<F, IO, E> Accept for PollFn<F>
@@ -76,11 +75,12 @@ where
 }
 
 /// Adapt a `Stream` of incoming connections into an `Accept`.
+/// 将传入连接的 `Stream` 改为 `Accept`。
 ///
 /// # Optional
 ///
-/// This function requires enabling the `stream` feature in your
-/// `Cargo.toml`.
+/// 此功能需要在
+/// `Cargo.toml` feature进行配置。
 #[cfg(feature = "stream")]
 pub fn from_stream<S, IO, E>(stream: S) -> impl Accept<Conn = IO, Error = E>
 where

@@ -7,10 +7,10 @@ use std::collections::HashMap;
 use aop::endpoint::DynEndpoint;
 
 
-/// The routing table used by `Server`
+/// `Server` 使用的路由
 ///
-/// Internally, we have a separate state machine per http method; indexing
-/// by the method first allows the table itself to be more efficient.
+/// 底层, 每个HTTP方法都有一个单独的状态；索引
+/// 通过该方法，可以提高效率
 #[allow(missing_debug_implementations)]
 pub(crate) struct Router<State> {
     method_map: HashMap<http_types::Method, MethodRouter<Box<DynEndpoint<State>>>>,
@@ -26,7 +26,7 @@ impl<State> std::fmt::Debug for Router<State> {
     }
 }
 
-/// The result of routing a URL
+/// 路由URL的结果
 pub(crate) struct Selection<'a, State> {
     pub(crate) endpoint: &'a DynEndpoint<State>,
     pub(crate) params: Captures<'static, 'static>,
@@ -73,8 +73,8 @@ impl<State: Clone + Send + Sync + 'static> Router<State> {
                 params: m.captures().into_owned(),
             }
         } else if method == http_types::Method::Head {
-            // If it is a HTTP HEAD request then check if there is a callback in the endpoints map
-            // if not then fallback to the behavior of HTTP GET else proceed as usual
+            // 如果是HTTP头请求，则检查endpoints映射中是否有回调
+            // 如果没有，则返回到HTTP GET的逻辑，否则照常进行
 
             self.route(path, http_types::Method::Get)
         } else if self
@@ -83,8 +83,8 @@ impl<State: Clone + Send + Sync + 'static> Router<State> {
             .filter(|(k, _)| **k != method)
             .any(|(_, r)| r.best_match(path).is_some())
         {
-            // If this `path` can be handled by a callback registered with a different HTTP method
-            // should return 405 Method Not Allowed
+            // 如果此 `path` 可以由使用其他HTTP方法注册的回调处理
+            // 应返回405 Method Not Allowed
             Selection {
                 endpoint: &method_not_allowed,
                 params: Captures::default(),

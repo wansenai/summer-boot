@@ -10,14 +10,6 @@ use async_std::path::PathBuf;
 use async_std::prelude::*;
 use async_std::{io, task};
 
-/// This represents a tide [Listener](crate::listener::Listener) that
-/// wraps an [async_std::os::unix::net::UnixListener]. It is implemented as an
-/// enum in order to allow creation of a tide::listener::UnixListener
-/// from a [`PathBuf`] spec that has not yet been bound OR from a bound
-/// [async_std::os::unix::net::UnixListener].
-///
-/// This is currently crate-visible only, and tide users are expected
-/// to create these through [ToListener](crate::ToListener) conversions.
 pub struct UnixListener<State> {
     path: Option<PathBuf>,
     listener: Option<net::UnixListener>,
@@ -68,11 +60,11 @@ where
     State: Clone + Send + Sync + 'static,
 {
     async fn bind(&mut self, server: Server<State>) -> io::Result<()> {
-        assert!(self.server.is_none(), "`bind` should only be called once");
+        assert!(self.server.is_none(), "`bind` 只能调用一次");
         self.server = Some(server);
 
         if self.listener.is_none() {
-            let path = self.path.take().expect("`bind` should only be called once");
+            let path = self.path.take().expect("`bind` 只能调用一次");
             let listener = net::UnixListener::bind(path).await?;
             self.listener = Some(listener);
         }
@@ -90,11 +82,11 @@ where
         let server = self
             .server
             .take()
-            .expect("`Listener::bind` must be called before `Listener::accept`");
+            .expect("`Listener::bind` 必须在之前调用 `Listener::accept`");
         let listener = self
             .listener
             .take()
-            .expect("`Listener::bind` must be called before `Listener::accept`");
+            .expect("`Listener::bind` 必须在之前调用 `Listener::accept`");
 
         let mut incoming = listener.incoming();
 
@@ -103,7 +95,7 @@ where
                 Err(ref e) if is_transient_error(e) => continue,
                 Err(error) => {
                     let delay = std::time::Duration::from_millis(500);
-                    crate::log::error!("Error: {}. Pausing for {:?}.", error, delay);
+                    crate::log::error!("Error: {}. for {:?}.", error, delay);
                     task::sleep(delay).await;
                     continue;
                 }
@@ -145,11 +137,11 @@ impl<State> Display for UnixListener<State> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self.listener {
             Some(listener) => {
-                let path = listener.local_addr().expect("Could not get local path dir");
+                let path = listener.local_addr().expect("无法获取本地路径目录");
                 let pathname = path
                     .as_pathname()
                     .and_then(|p| p.canonicalize().ok())
-                    .expect("Could not canonicalize path dir");
+                    .expect("无法格式化路径目录");
                 write!(f, "http+unix://{}", pathname.display())
             }
             None => match &self.path {

@@ -1,4 +1,4 @@
-//! An HTTP server
+//! HTTP server
 use crate::tcp;
 use crate::log;
 use crate::gateway;
@@ -13,37 +13,34 @@ use utils::middleware::{Middleware, Next};
 use utils::util;
 use gateway::router::{Router, Selection};
 
-/// An HTTP server.
+/// HTTP服务器。
 ///
-/// Servers are built up as a combination of *state*, *endpoints* and *middleware*:
+/// 服务器由 *state*, *endpoints* 和 *middleware* 组成。
 ///
-/// - Server state is user-defined, and is provided via the [`Server::with_state`] function. The
-/// state is available as a shared reference to all app endpoints.
+/// - 服务器状态是用户定义的，通过 [`summer_boot::Server::with_state`] 函数使用. 这个
+/// 状态可以用于所有应用 endpoints 共享引用.
 ///
-/// - Endpoints provide the actual application-level code corresponding to
-/// particular URLs. The [`Server::at`] method creates a new *route* (using
-/// standard router syntax), which can then be used to register endpoints
-/// for particular HTTP request types.
+/// - Endpoints 提供与指定URL [`summer_boot::Server::at`] 创建一个 *路由* 
+/// 然后可以用于绑定注册到 endpoints 
+/// 对于指定HTTP请求类型进行使用
 ///
-/// - Middleware extends the base Tide framework with additional request or
-/// response processing, such as compression, default headers, or logging. To
-/// add middleware to an app, use the [`Server::middleware`] method.
+/// - Middleware 通过附加request或
+/// response 处理, 例如压缩、默认请求头或日志记录。到
+/// 中间件添加到应用程序中，使用 [`summer_boot::Server::middleware`] 方法.
 pub struct Server<State> {
     router: Arc<Router<State>>,
     state: State,
-    /// Holds the middleware stack.
+    /// 保存 middleware 堆栈 这里用了多线程引用计数.
     ///
-    /// Note(Fishrock123): We do actually want this structure.
-    /// The outer Arc allows us to clone in .respond() without cloning the array.
-    /// The Vec allows us to add middleware at runtime.
-    /// The inner Arc-s allow MiddlewareEndpoint-s to be cloned internally.
-    /// We don't use a Mutex around the Vec here because adding a middleware during execution should be an error.
+    /// Vec允许我们在运行时添加中间件。
+    /// 内部 Arc-s 允许在内部克隆 MiddlewareEndpoint-s 。
+    /// 在这里不在Vec使用互斥体，因为在执行期间添加中间件应该是一个错误。
     #[allow(clippy::rc_buffer)]
     middleware: Arc<Vec<Arc<dyn Middleware<State>>>>,
 }
 
 impl Server<()> {
-    /// Create a new Tide server.
+    /// 创建一个summer boot web2 server.
     ///
     /// # Examples
     ///
@@ -51,7 +48,7 @@ impl Server<()> {
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/").get(|_| async { Ok("Hello, world!") });
     /// app.listen("127.0.0.1:8080").await?;
     /// #
@@ -73,9 +70,9 @@ impl<State> Server<State>
 where
     State: Clone + Send + Sync + 'static,
 {
-    /// Create a new Tide server with shared application scoped state.
+    /// 创建一个可以共享应用程序作用域状态到新服务.
     ///
-    /// Application scoped state is useful for storing items
+    // /应用程序范围的状态对于存储有用
     ///
     /// # Examples
     ///
@@ -83,21 +80,21 @@ where
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// use tide::Request;
+    /// use summer_boot::Request;
     ///
-    /// /// The shared application state.
+    /// /// 共享应用程序状态
     /// #[derive(Clone)]
     /// struct State {
     ///     name: String,
     /// }
     ///
-    /// // Define a new instance of the state.
+    /// // 定义状态新的一个实例
     /// let state = State {
-    ///     name: "Nori".to_string()
+    ///     name: "James".to_string()
     /// };
     ///
-    /// // Initialize the application with state.
-    /// let mut app = tide::with_state(state);
+    /// // 使用状态初始化应用程序
+    /// let mut app = summer_boot::with_state(state);
     /// app.at("/").get(|req: Request<State>| async move {
     ///     Ok(format!("Hello, {}!", &req.state().name))
     /// });
@@ -109,6 +106,7 @@ where
         Self {
             router: Arc::new(Router::new()),
             middleware: Arc::new(vec![
+                // 暂时没有使用到cookies
                 #[cfg(feature = "cookies")]
                 Arc::new(cookies::CookiesMiddleware::new()),
                 #[cfg(feature = "logger")]
@@ -118,41 +116,28 @@ where
         }
     }
 
-    /// Add a new route at the given `path`, relative to root.
+    /// 在给定的 `path`（相对于根）处添加新路由。
     ///
-    /// Routing means mapping an HTTP request to an endpoint. Here Tide applies
-    /// a "table of contents" approach, which makes it easy to see the overall
-    /// app structure. Endpoints are selected solely by the path and HTTP method
-    /// of a request: the path determines the resource and the HTTP verb the
-    /// respective endpoint of the selected resource. Example:
+    /// 路由意味着将HTTP请求映射到endpoints。
+    /// 一种“目录”方法，可以方便地查看总体
+    /// 应用程序结构。Endpoints仅由path和HTTP方法选择
+    /// 请求：路径决定资源和HTTP请求所选资源的各个endpoints。
+    /// 
+    /// #Example:
     ///
     /// ```rust,no_run
-    /// # let mut app = tide::Server::new();
+    /// # let mut app = summer_boot::new();
     /// app.at("/").get(|_| async { Ok("Hello, world!") });
     /// ```
     ///
-    /// A path is comprised of zero or many segments, i.e. non-empty strings
-    /// separated by '/'. There are two kinds of segments: concrete and
-    /// wildcard. A concrete segment is used to exactly match the respective
-    /// part of the path of the incoming request. A wildcard segment on the
-    /// other hand extracts and parses the respective part of the path of the
-    /// incoming request to pass it along to the endpoint as an argument. A
-    /// wildcard segment is written as `:name`, which creates an endpoint
-    /// parameter called `name`. It is not possible to define wildcard segments
-    /// with different names for otherwise identical paths.
+    /// 路径由零个或多个段组成，即非空字符串，由 '/' 分隔。
     ///
-    /// Alternatively a wildcard definitions can start with a `*`, for example
-    /// `*path`, which means that the wildcard will match to the end of given
-    /// path, no matter how many segments are left, even nothing.
-    ///
-    /// The name of the parameter can be omitted to define a path that matches
-    /// the required structure, but where the parameters are not required.
-    /// `:` will match a segment, and `*` will match an entire path.
-    ///
-    /// Here are some examples omitting the HTTP verb based endpoint selection:
+    /// 或者可以使用通配符
+    /// `*path` 代表使用通配符配置路由
+    /// 以下是一些基于HTTP的endpoints 路由选择的示例：
     ///
     /// ```rust,no_run
-    /// # let mut app = tide::Server::new();
+    /// # let mut app = summer_boot::new();
     /// app.at("/");
     /// app.at("/hello");
     /// app.at("add_two/:num");
@@ -161,24 +146,22 @@ where
     /// app.at("static/:context/:");
     /// ```
     ///
-    /// There is no fallback route matching, i.e. either a resource is a full
-    /// match or not, which means that the order of adding resources has no
-    /// effect.
+    /// 没有备用路由匹配，即资源已满
+    /// 匹配和没有匹配，意味着添加资源的顺序没有
     pub fn at<'a>(&'a mut self, path: &str) -> Route<'a, State> {
         let router = Arc::get_mut(&mut self.router)
-            .expect("Registering routes is not possible after the Server has started");
+            .expect("服务器启动后无法注册路由");
         Route::new(router, path.to_owned())
     }
 
-    /// Add middleware to an application.
+    /// 向应用程序添加中间件。
     ///
-    /// Middleware provides customization of the request/response cycle, such as compression,
-    /// logging, or header modification. Middleware is invoked when processing a request, and can
-    /// either continue processing (possibly modifying the response) or immediately return a
-    /// response. See the [`Middleware`] trait for details.
+    /// 中间件提供请求/响应
+    /// 日志记录或标题修改。中间件在处理请求时被调用，并且可以
+    /// 继续处理（可能修改响应）或立即返回响应
+    /// 响应。有关详细信息，请参考 [`Middleware`] trait
     ///
-    /// Middleware can only be added at the "top level" of an application, and is processed in the
-    /// order in which it is applied.
+    /// 中间件只能在应用程序的 `顶层` 添加，并使用应用顺序
     pub fn with<M>(&mut self, middleware: M) -> &mut Self
     where
         M: Middleware<State>,
@@ -190,10 +173,10 @@ where
         self
     }
 
-    /// Asynchronously serve the app with the supplied listener.
+    /// 使用提供的侦听器异步为应用程序提供服务。
     ///
-    /// This is a shorthand for calling `Server::bind`, logging the `ListenInfo`
-    /// instances from `Listener::info`, and then calling `Listener::accept`.
+    /// 这是调用 `summer_boot::Server::bind`, 记录`ListenInfo` 实例
+    /// 通过实例 `Listener::info`, 然后调用 `Listener::accept`.
     ///
     /// # Examples
     ///
@@ -201,7 +184,7 @@ where
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/").get(|_| async { Ok("Hello, world!") });
     /// app.listen("127.0.0.1:8080").await?;
     /// #
@@ -217,16 +200,16 @@ where
         Ok(())
     }
 
-    /// Asynchronously bind the listener.
+    /// 开发中 todo
+    /// 
+    /// 异步绑定侦听器。
+    /// 
+    /// 绑定侦听器。这将打开网络端口，但没有接受传入的连接。
+    /// 应调用 `Listener::listen` 开始连接
     ///
-    /// Bind the listener. This starts the listening process by opening the
-    /// necessary network ports, but not yet accepting incoming connections.
-    /// `Listener::listen` should be called after this to start accepting
-    /// connections.
-    ///
-    /// When calling `Listener::info` multiple `ListenInfo` instances may be
-    /// returned. This is useful when using for example `ConcurrentListener`
-    /// which enables a single server to listen on muliple ports.
+    /// 调用 `Listener::info` 的时候可能出现多个 `ListenInfo` 实例返回
+    /// 这在使用例如 `ConcurrentListener` 时很有用
+    /// 因为它可以让单个服务器能够侦听多个端口。
     ///
     /// # Examples
     ///
@@ -234,9 +217,9 @@ where
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// use tide::prelude::*;
+    /// # use summer_boot::prelude::*;
     ///
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/").get(|_| async { Ok("Hello, world!") });
     /// let mut listener = app.bind("127.0.0.1:8080").await?;
     /// for info in listener.info().iter() {
@@ -255,10 +238,10 @@ where
         Ok(listener)
     }
 
-    /// Respond to a `Request` with a `Response`.
+    /// 响应 `Request`
     ///
-    /// This method is useful for testing endpoints directly,
-    /// or for creating servers over custom transports.
+    /// 此方法对于直接测试endpoints
+    /// 或者通过自定义传输创建服务器。
     ///
     /// # Examples
     ///
@@ -266,9 +249,9 @@ where
     /// # #[async_std::main]
     /// # async fn main() -> http_types::Result<()> {
     /// #
-    /// use tide::http::{Url, Method, Request, Response};
+    /// use summer_boot::http::{Url, Method, Request, Response};
     ///
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/").get(|_| async { Ok("hello world") });
     ///
     /// let req = Request::new(Method::Get, Url::parse("https://example.com")?);
@@ -305,7 +288,7 @@ where
         Ok(res.into())
     }
 
-    /// Gets a reference to the server's state. This is useful for testing and nesting:
+    /// 获取对服务器状态的引用。用于测试和嵌套：
     ///
     /// # Example
     ///
@@ -375,19 +358,19 @@ impl<State: Clone + Send + Sync + Unpin + 'static> http_client::HttpClient for S
 
 #[cfg(test)]
 mod test {
-    use crate as tide;
+    use crate as summer_boot;
 
     #[test]
     fn allow_nested_server_with_same_state() {
-        let inner = tide::new();
-        let mut outer = tide::new();
+        let inner = summer_boot::new();
+        let mut outer = summer_boot::new();
         outer.at("/foo").get(inner);
     }
 
     #[test]
     fn allow_nested_server_with_different_state() {
-        let inner = tide::with_state(1);
-        let mut outer = tide::new();
+        let inner = summer_boot::with_state(1);
+        let mut outer = summer_boot::new();
         outer.at("/foo").get(inner);
     }
 }

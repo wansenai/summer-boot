@@ -28,7 +28,7 @@ where
                 {
                     Err(io::Error::new(
                         io::ErrorKind::Other,
-                        "Unix sockets not supported on this platform",
+                        "此平台上不支持Unix套接字",
                     ))
                 }
             }
@@ -39,12 +39,12 @@ where
 
             "tls" | "ssl" | "https" => Err(io::Error::new(
                 io::ErrorKind::Other,
-                "parsing TLS listeners not supported yet",
+                "尚不支持解析TLS侦听器",
             )),
 
             _ => Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "unrecognized url scheme",
+                "无法识别的url",
             )),
         }
     }
@@ -86,7 +86,7 @@ where
         } else {
             Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                format!("unable to parse listener from `{}`", self),
+                format!("无法解析侦听器 `{}`", self),
             ))
         }
     }
@@ -323,7 +323,7 @@ mod parse_tests {
         use super::*;
         #[test]
         fn str_url_to_unix_listener() {
-            let err = listen("http+unix:///var/run/tide/socket").unwrap_err();
+            let err = listen("http+unix:///var/run/socket").unwrap_err();
             assert_eq!(
                 err.to_string(),
                 "Unix sockets not supported on this platform"

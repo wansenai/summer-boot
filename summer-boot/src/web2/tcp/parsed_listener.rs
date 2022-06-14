@@ -6,13 +6,6 @@ use crate::Server;
 use async_std::io;
 use std::fmt::{self, Debug, Display, Formatter};
 
-/// This is an enum that contains variants for each of the listeners
-/// that can be parsed from a string. This is used as the associated
-/// Listener type for the string-parsing
-/// [ToListener](crate::listener::ToListener) implementations
-///
-/// This is currently crate-visible only, and tide users are expected
-/// to create these through [ToListener](crate::ToListener) conversions.
 pub enum ParsedListener<State> {
     Unix(UnixListener<State>),
     Tcp(TcpListener<State>),

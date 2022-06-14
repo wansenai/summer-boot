@@ -1,4 +1,4 @@
-//! Types that represent HTTP transports and binding
+//! 表示HTTP传输和绑定的类型
 use crate::Server;
 
 mod concurrent_listener;
@@ -22,26 +22,15 @@ pub(crate) use parsed_listener::ParsedListener;
 pub(crate) use tcp_listener::TcpListener;
 pub(crate) use unix_listener::UnixListener;
 
-/// The Listener trait represents an implementation of http transport for a tide
-/// application. In order to provide a Listener to tide, you will also need to
-/// implement at least one [`ToListener`](crate::listener::ToListener) that
-/// outputs your Listener type.
 #[async_trait]
 pub trait Listener<State>: Debug + Display + Send + Sync + 'static
 where
     State: Send + Sync + 'static,
 {
-    /// Bind the listener. This starts the listening process by opening the
-    /// necessary network ports, but not yet accepting incoming connections. This
-    /// method must be called before `accept`.
     async fn bind(&mut self, app: Server<State>) -> io::Result<()>;
 
-    /// Start accepting incoming connections. This method must be called only
-    /// after `bind` has succeeded.
     async fn accept(&mut self) -> io::Result<()>;
 
-    /// Expose information about the connection. This should always return valid
-    /// data after `bind` has succeeded.
     fn info(&self) -> Vec<ListenInfo>;
 }
 
@@ -76,9 +65,6 @@ pub(crate) fn is_transient_error(e: &io::Error) -> bool {
     )
 }
 
-/// Information about the `Listener`.
-///
-/// See [`Report`](../listener/trait.Report.html) for more.
 #[derive(Debug, Clone)]
 pub struct ListenInfo {
     conn_string: String,
@@ -87,10 +73,6 @@ pub struct ListenInfo {
 }
 
 impl ListenInfo {
-    /// Create a new instance of `ListenInfo`.
-    ///
-    /// This method should only be called when implementing a new Tide `listener`
-    /// strategy.
     pub fn new(conn_string: String, transport: String, tls: bool) -> Self {
         Self {
             conn_string,
@@ -99,19 +81,14 @@ impl ListenInfo {
         }
     }
 
-    /// Get the connection string.
     pub fn connection(&self) -> &str {
         self.conn_string.as_str()
     }
 
-    /// The underlying transport this connection listens on.
-    ///
-    /// Examples are: "tcp", "uds", etc.
     pub fn transport(&self) -> &str {
         self.transport.as_str()
     }
 
-    /// Is the connection encrypted?
     pub fn is_encrypted(&self) -> bool {
         self.tls
     }

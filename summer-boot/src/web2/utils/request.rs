@@ -15,13 +15,10 @@ use crate::http::{self, Body, Method, Mime, StatusCode, Url, Version};
 use crate::Response;
 
 pin_project_lite::pin_project! {
-    /// An HTTP request.
+    /// HTTP request.
     ///
-    /// The `Request` gives endpoints access to basic information about the incoming
-    /// request, route parameters, and various ways of accessing the request's body.
-    ///
-    /// Requests also provide *extensions*, a type map primarily used for low-level
-    /// communication between middleware and endpoints.
+    /// 请求、路由参数以及访问请求的各种方式。
+    /// 中间件和endpoints之间的通信
     #[derive(Debug)]
     pub struct Request<State> {
         pub(crate) state: State,
@@ -32,7 +29,7 @@ pin_project_lite::pin_project! {
 }
 
 impl<State> Request<State> {
-    /// Create a new `Request`.
+    /// 创建一个新的 `Request`.
     pub(crate) fn new(
         state: State,
         req: http_types::Request,
@@ -45,7 +42,7 @@ impl<State> Request<State> {
         }
     }
 
-    /// Access the request's HTTP method.
+    /// 访问请求的HTTP方法。
     ///
     /// # Examples
     ///
@@ -53,9 +50,9 @@ impl<State> Request<State> {
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// use tide::Request;
+    /// use summer_boot::Request;
     ///
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/").get(|req: Request<()>| async move {
     ///     assert_eq!(req.method(), http_types::Method::Get);
     ///     Ok("")
@@ -69,7 +66,7 @@ impl<State> Request<State> {
         self.req.method()
     }
 
-    /// Access the request's full URI method.
+    /// 访问请求的完整URI方法。
     ///
     /// # Examples
     ///
@@ -77,11 +74,11 @@ impl<State> Request<State> {
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// use tide::Request;
+    /// use summer_boot::Request;
     ///
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/").get(|req: Request<()>| async move {
-    ///     assert_eq!(req.url(), &"/".parse::<tide::http::Url>().unwrap());
+    ///     assert_eq!(req.url(), &"/".parse::<summer_boot::http::Url>().unwrap());
     ///     Ok("")
     /// });
     /// app.listen("127.0.0.1:8080").await?;
@@ -93,7 +90,7 @@ impl<State> Request<State> {
         self.req.url()
     }
 
-    /// Access the request's HTTP version.
+    /// 访问请求的HTTP版本。
     ///
     /// # Examples
     ///
@@ -101,9 +98,9 @@ impl<State> Request<State> {
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// use tide::Request;
+    /// use summer_boot::Request;
     ///
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/").get(|req: Request<()>| async move {
     ///     assert_eq!(req.version(), Some(http_types::Version::Http1_1));
     ///     Ok("")
@@ -117,54 +114,51 @@ impl<State> Request<State> {
         self.req.version()
     }
 
-    /// Get the peer socket address for the underlying transport, if
-    /// that information is available for this request.
+    /// 获取基础传输的socket地址
     #[must_use]
     pub fn peer_addr(&self) -> Option<&str> {
         self.req.peer_addr()
     }
 
-    /// Get the local socket address for the underlying transport, if
-    /// that information is available for this request.
+    /// 获取基础传输的本地地址
     #[must_use]
     pub fn local_addr(&self) -> Option<&str> {
         self.req.local_addr()
     }
 
-    /// Get the remote address for this request.
+    /// 获取此请求的远程地址。
     ///
-    /// This is determined in the following priority:
-    /// 1. `Forwarded` header `for` key
-    /// 2. The first `X-Forwarded-For` header
-    /// 3. Peer address of the transport
+    /// 按以下优先级确定：
+    /// 1. `Forwarded` head `for` key
+    /// 2. 第一个 `X-Forwarded-For` header
+    /// 3. 传输的对等地址
     #[must_use]
     pub fn remote(&self) -> Option<&str> {
         self.req.remote()
     }
 
-    /// Get the destination host for this request.
+    /// 获取此请求的目标主机。
     ///
-    /// This is determined in the following priority:
+    /// 按以下优先级确定：
     /// 1. `Forwarded` header `host` key
-    /// 2. The first `X-Forwarded-Host` header
+    /// 2. 第一个 `X-Forwarded-Host` header
     /// 3. `Host` header
-    /// 4. URL domain, if any
+    /// 4. URL域
     #[must_use]
     pub fn host(&self) -> Option<&str> {
         self.req.host()
     }
 
-    /// Get the request content type as a `Mime`.
+    /// 以“Mime”形式获取请求内容类型。
     ///
-    /// This gets the request `Content-Type` header.
+    /// 这将获取请求 `Content-Type` header。
     ///
-    /// [Read more on MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)
     #[must_use]
     pub fn content_type(&self) -> Option<Mime> {
         self.req.content_type()
     }
 
-    /// Get an HTTP header.
+    /// 获取HTTP header.
     ///
     /// # Examples
     ///
@@ -172,9 +166,9 @@ impl<State> Request<State> {
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// use tide::Request;
+    /// use summer_boot::Request;
     ///
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/").get(|req: Request<()>| async move {
     ///     assert_eq!(req.header("X-Forwarded-For").unwrap(), "127.0.0.1");
     ///     Ok("")
@@ -191,12 +185,12 @@ impl<State> Request<State> {
         self.req.header(key)
     }
 
-    /// Get a mutable reference to a header.
+    /// 获取标题的可变引用。
     pub fn header_mut(&mut self, name: impl Into<HeaderName>) -> Option<&mut HeaderValues> {
         self.req.header_mut(name)
     }
 
-    /// Set an HTTP header.
+    /// 设置一个 HTTP header.
     pub fn insert_header(
         &mut self,
         name: impl Into<HeaderName>,
@@ -205,76 +199,75 @@ impl<State> Request<State> {
         self.req.insert_header(name, values)
     }
 
-    /// Append a header to the headers.
+    /// 将header添加到headers。
     ///
-    /// Unlike `insert` this function will not override the contents of a header, but insert a
-    /// header if there aren't any. Or else append to the existing list of headers.
+    /// 与 `insert` 不同，此函数不会重写标头的内容，而是插入
+    /// 如果没有header。添加到现有的headers列表中。
     pub fn append_header(&mut self, name: impl Into<HeaderName>, values: impl ToHeaderValues) {
         self.req.append_header(name, values)
     }
 
-    /// Remove a header.
+    /// 移除一个 header.
     pub fn remove_header(&mut self, name: impl Into<HeaderName>) -> Option<HeaderValues> {
         self.req.remove_header(name)
     }
 
-    /// An iterator visiting all header pairs in arbitrary order.
+    /// 以任意顺序访问所有header的迭代。
     #[must_use]
     pub fn iter(&self) -> headers::Iter<'_> {
         self.req.iter()
     }
 
-    /// An iterator visiting all header pairs in arbitrary order, with mutable references to the
-    /// values.
+    /// 迭代器以任意顺序访问所有header，并对值进行可变引用。
     #[must_use]
     pub fn iter_mut(&mut self) -> headers::IterMut<'_> {
         self.req.iter_mut()
     }
 
-    /// An iterator visiting all header names in arbitrary order.
+    /// 以任意顺序访问所有header名称的迭代。
     #[must_use]
     pub fn header_names(&self) -> headers::Names<'_> {
         self.req.header_names()
     }
 
-    /// An iterator visiting all header values in arbitrary order.
+    /// 以任意顺序访问所有header值的迭代。
     #[must_use]
     pub fn header_values(&self) -> headers::Values<'_> {
         self.req.header_values()
     }
 
-    /// Get a request extension value.
+    /// 获取请求扩展值。
     #[must_use]
     pub fn ext<T: Send + Sync + 'static>(&self) -> Option<&T> {
         self.req.ext().get()
     }
 
-    /// Get a mutable reference to value stored in request extensions.
+    /// 获取对存储在请求扩展中的值的可变引用。
     #[must_use]
     pub fn ext_mut<T: Send + Sync + 'static>(&mut self) -> Option<&mut T> {
         self.req.ext_mut().get_mut()
     }
 
-    /// Set a request extension value.
+    /// 设置请求扩展值。
     pub fn set_ext<T: Send + Sync + 'static>(&mut self, val: T) -> Option<T> {
         self.req.ext_mut().insert(val)
     }
 
     #[must_use]
-    ///  Access application scoped state.
+    ///  访问应用程序范围的状态。
     pub fn state(&self) -> &State {
         &self.state
     }
 
-    /// Extract and parse a route parameter by name.
+    /// 按名称提取和解析路由参数。
     ///
-    /// Returns the parameter as a `&str`, borrowed from this `Request`.
-    ///
-    /// The name should *not* include the leading `:`.
+    /// 以 `&str` 形式返回参数，该参数是从此 `Request` 借用的。
+    /// 
+    /// 名称应不包括引用 `:`。
     ///
     /// # Errors
     ///
-    /// An error is returned if `key` is not a valid parameter for the route.
+    /// 如果 `key` 不是路由的有效参数，则返回错误。
     ///
     /// # Examples
     ///
@@ -282,14 +275,14 @@ impl<State> Request<State> {
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// use tide::{Request, Result};
+    /// use summer_boot::{Request, Result};
     ///
     /// async fn greet(req: Request<()>) -> Result<String> {
     ///     let name = req.param("name").unwrap_or("world");
     ///     Ok(format!("Hello, {}!", name))
     /// }
     ///
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/hello").get(greet);
     /// app.at("/hello/:name").get(greet);
     /// app.listen("127.0.0.1:8080").await?;
@@ -304,9 +297,9 @@ impl<State> Request<State> {
             .ok_or_else(|| format_err!("Param \"{}\" not found", key.to_string()))
     }
 
-    /// Fetch the wildcard from the route, if it exists
+    /// 从路由中提取通配符（如果存在）
     ///
-    /// Returns the parameter as a `&str`, borrowed from this `Request`.
+    /// 以 `&str` 形式返回参数，该参数是从此 `Request` 借用的。
     ///
     /// # Examples
     ///
@@ -314,14 +307,14 @@ impl<State> Request<State> {
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// use tide::{Request, Result};
+    /// use summer_boot::{Request, Result};
     ///
     /// async fn greet(req: Request<()>) -> Result<String> {
     ///     let name = req.wildcard().unwrap_or("world");
     ///     Ok(format!("Hello, {}!", name))
     /// }
     ///
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/hello/*").get(greet);
     /// app.listen("127.0.0.1:8080").await?;
     /// #
@@ -334,17 +327,18 @@ impl<State> Request<State> {
             .find_map(|captures| captures.wildcard())
     }
 
-    /// Parse the URL query component into a struct, using [serde_qs](https://docs.rs/serde_qs). To
-    /// get the entire query as an unparsed string, use `request.url().query()`.
+    /// 
+    /// 使用[serde_qs](https://docs.rs/serde_qs)将URL查询组件解析为结构
+    /// 将整个查询作为未解析的字符串获取，使用 `request.url().query()`。
     ///
     /// # Examples
     ///
     /// ```
     /// use std::collections::HashMap;
-    /// use tide::http::{self, convert::Deserialize};
-    /// use tide::Request;
+    /// use summer_boot::http::{self, convert::Deserialize};
+    /// use summer_boot::Request;
     ///
-    /// // An owned structure:
+    /// // 所有权结构:
     ///
     /// #[derive(Deserialize)]
     /// struct Index {
@@ -352,13 +346,13 @@ impl<State> Request<State> {
     ///     selections: HashMap<String, String>,
     /// }
     ///
-    /// let req: Request<()> = http::Request::get("https://httpbin.org/get?page=2&selections[width]=narrow&selections[height]=tall").into();
+    /// let req: Request<()> = http::Request::get("https://baidu.com/get?page=2&selections[width]=narrow&selections[height]=tall").into();
     /// let Index { page, selections } = req.query().unwrap();
     /// assert_eq!(page, 2);
     /// assert_eq!(selections["width"], "narrow");
     /// assert_eq!(selections["height"], "tall");
     ///
-    /// // Using borrows:
+    /// // 使用借用s:
     ///
     /// #[derive(Deserialize)]
     /// struct Query<'q> {
@@ -373,30 +367,28 @@ impl<State> Request<State> {
         self.req.query()
     }
 
-    /// Set the body reader.
+    /// 设置body读取
     pub fn set_body(&mut self, body: impl Into<Body>) {
         self.req.set_body(body)
     }
 
-    /// Take the request body as a `Body`.
+    /// 处理请求 `Body`
     ///
-    /// This method can be called after the body has already been taken or read,
-    /// but will return an empty `Body`.
+    /// 可以在获取或读取body后调用此方法，
+    /// 但是将返回一个空的`Body`.
     ///
-    /// This is useful for consuming the body via an AsyncReader or AsyncBufReader.
+    /// 这对于通过AsyncReader或AsyncBufReader有用。
     pub fn take_body(&mut self) -> Body {
         self.req.take_body()
     }
 
-    /// Reads the entire request body into a byte buffer.
+    /// 将整个请求body读取字节缓冲区。
     ///
-    /// This method can be called after the body has already been read, but will
-    /// produce an empty buffer.
+    /// 可以在读取body后调用此方法，但生成空缓冲区。
     ///
     /// # Errors
     ///
-    /// Any I/O error encountered while reading the body is immediately returned
-    /// as an `Err`.
+    /// 读取body时遇到的任何I/O错误都会立即返回错误 `Err`
     ///
     /// # Examples
     ///
@@ -404,9 +396,9 @@ impl<State> Request<State> {
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// use tide::Request;
+    /// use summer_boot::Request;
     ///
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/").get(|mut req: Request<()>| async move {
     ///     let _body: Vec<u8> = req.body_bytes().await.unwrap();
     ///     Ok("")
@@ -420,17 +412,15 @@ impl<State> Request<State> {
         Ok(res)
     }
 
-    /// Reads the entire request body into a string.
+    /// 将整个请求body读取字符串。
     ///
-    /// This method can be called after the body has already been read, but will
-    /// produce an empty buffer.
+    /// 可以在读取body后调用此方法，但生成空缓冲区。
     ///
     /// # Errors
+    /// 
+    /// 读取body时遇到的任何I/O错误都会立即返回错误 `Err`
     ///
-    /// Any I/O error encountered while reading the body is immediately returned
-    /// as an `Err`.
-    ///
-    /// If the body cannot be interpreted as valid UTF-8, an `Err` is returned.
+    /// 如果body不能解释有效的UTF-8，则返回 `Err`
     ///
     /// # Examples
     ///
@@ -438,9 +428,9 @@ impl<State> Request<State> {
     /// # use async_std::task::block_on;
     /// # fn main() -> Result<(), std::io::Error> { block_on(async {
     /// #
-    /// use tide::Request;
+    /// use summer_boot::Request;
     ///
-    /// let mut app = tide::new();
+    /// let mut app = summer_boot::new();
     /// app.at("/").get(|mut req: Request<()>| async move {
     ///     let _body: String = req.body_string().await.unwrap();
     ///     Ok("")
@@ -454,26 +444,24 @@ impl<State> Request<State> {
         Ok(res)
     }
 
-    /// Reads and deserialized the entire request body via json.
+    /// 通过json读取并反序列化整个请求body。
     ///
     /// # Errors
     ///
-    /// Any I/O error encountered while reading the body is immediately returned
-    /// as an `Err`.
+    /// 读取body时遇到的任何I/O错误都会立即返回错误 `Err`
     ///
-    /// If the body cannot be interpreted as valid json for the target type `T`,
-    /// an `Err` is returned.
+    /// 如果无法将body解释为目标类型 `T` 的有效json，则返回 `Err`
     pub async fn body_json<T: serde::de::DeserializeOwned>(&mut self) -> crate::Result<T> {
         let res = self.req.body_json().await?;
         Ok(res)
     }
 
-    /// Parse the request body as a form.
+    /// 将请求主体解析为表单
     ///
     /// ```rust
     /// # fn main() -> Result<(), std::io::Error> { async_std::task::block_on(async {
-    /// use tide::prelude::*;
-    /// let mut app = tide::new();
+    /// use summer_boot::prelude::*;
+    /// let mut app = summer_boot::new();
     ///
     /// #[derive(Deserialize)]
     /// struct Animal {
@@ -481,7 +469,7 @@ impl<State> Request<State> {
     ///   legs: u8
     /// }
     ///
-    /// app.at("/").post(|mut req: tide::Request<()>| async move {
+    /// app.at("/").post(|mut req: summer_boot::Request<()>| async move {
     ///     let animal: Animal = req.body_form().await?;
     ///     Ok(format!(
     ///         "hello, {}! i've put in an order for {} shoes",
@@ -493,10 +481,10 @@ impl<State> Request<State> {
     /// app.listen("localhost:8000").await?;
     /// # }
     ///
-    /// // $ curl localhost:8000/orders/shoes -d "name=chashu&legs=4"
+    /// // $ curl localhost:8000/test/api -d "name=chashu&legs=4"
     /// // hello, chashu! i've put in an order for 4 shoes
     ///
-    /// // $ curl localhost:8000/orders/shoes -d "name=mary%20millipede&legs=750"
+    /// // $ curl localhost:8000/test/api -d "name=mary%20millipede&legs=750"
     /// // number too large to fit in target type
     /// # Ok(()) })}
     /// ```
@@ -505,7 +493,7 @@ impl<State> Request<State> {
         Ok(res)
     }
 
-    /// returns a `Cookie` by name of the cookie.
+    /// 按Cookie的名称返回 `Cookie`
     #[cfg(feature = "cookies")]
     #[must_use]
     pub fn cookie(&self, name: &str) -> Option<Cookie<'static>> {
@@ -513,43 +501,41 @@ impl<State> Request<State> {
             .and_then(|cookie_data| cookie_data.content.read().unwrap().get(name).cloned())
     }
 
-    /// Retrieves a reference to the current session.
+    /// 检索对当前session的引用。
     ///
     /// # Panics
     ///
-    /// This method will panic if a tide::sessions:SessionMiddleware has not
-    /// been run.
+    /// 如果summer_boot::sessions:SessionMiddleware 没有在运行。
     #[cfg(feature = "sessions")]
     pub fn session(&self) -> &crate::sessions::Session {
         self.ext::<crate::sessions::Session>().expect(
-            "request session not initialized, did you enable tide::sessions::SessionMiddleware?",
+            "请求会话未初始化, 是否启用了summer_boot::sessions::SessionMiddleware?",
         )
     }
 
-    /// Retrieves a mutable reference to the current session.
+    /// 检索对当前会话的可变引用。
     ///
     /// # Panics
     ///
-    /// This method will panic if a tide::sessions:SessionMiddleware has not
-    /// been run.
+    /// 如果summer_boot::sessions:SessionMiddleware 没有在运行。
     #[cfg(feature = "sessions")]
     pub fn session_mut(&mut self) -> &mut crate::sessions::Session {
         self.ext_mut().expect(
-            "request session not initialized, did you enable tide::sessions::SessionMiddleware?",
+            "请求会话未初始化, 是否启用了summer_boot::sessions::SessionMiddleware?",
         )
     }
 
-    /// Get the length of the body stream, if it has been set.
+    /// 获取body流的长度（如果已设置）。
     ///
-    /// This value is set when passing a fixed-size object into as the body. E.g. a string, or a
-    /// buffer. Consumers of this API should check this value to decide whether to use `Chunked`
-    /// encoding, or set the response length.
+    /// 将固定大小的对象传递到作为body时，会设置此值(比如字符串)。 或者缓冲区。
+    /// 此API的使用应检查此值，决定是否使用 `Chunked`
+    /// 设置响应长度
     #[must_use]
     pub fn len(&self) -> Option<usize> {
         self.req.len()
     }
 
-    /// Returns `true` if the request has a set body stream length of zero, `false` otherwise.
+    /// 如果请求的设置body流长度为零，则返回 `true`，否则返回 `false`。
     #[must_use]
     pub fn is_empty(&self) -> Option<bool> {
         Some(self.req.len()? == 0)
@@ -614,7 +600,7 @@ impl<State> IntoIterator for Request<State> {
     type Item = (HeaderName, HeaderValues);
     type IntoIter = http_types::headers::IntoIter;
 
-    /// Returns a iterator of references over the remaining items.
+    /// 返回对其余项的引用的迭代.
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
         self.req.into_iter()
@@ -644,11 +630,11 @@ impl<'a, State> IntoIterator for &'a mut Request<State> {
 impl<State> Index<HeaderName> for Request<State> {
     type Output = HeaderValues;
 
-    /// Returns a reference to the value corresponding to the supplied name.
+    /// 返回对与提供的名称相对应的值的引用。
     ///
     /// # Panics
     ///
-    /// Panics if the name is not present in `Request`.
+    /// 如果 `Request` 中没有该名称，则会panic
     #[inline]
     fn index(&self, name: HeaderName) -> &HeaderValues {
         &self.req[name]
@@ -658,11 +644,11 @@ impl<State> Index<HeaderName> for Request<State> {
 impl<State> Index<&str> for Request<State> {
     type Output = HeaderValues;
 
-    /// Returns a reference to the value corresponding to the supplied name.
+    /// 返回对与提供的名称相对应的值的引用。
     ///
     /// # Panics
     ///
-    /// Panics if the name is not present in `Request`.
+    /// 如果 `Request` 中没有该名称，则会panic
     #[inline]
     fn index(&self, name: &str) -> &HeaderValues {
         &self.req[name]

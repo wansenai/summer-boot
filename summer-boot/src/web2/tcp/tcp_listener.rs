@@ -9,14 +9,6 @@ use async_std::net::{self, SocketAddr, TcpStream};
 use async_std::prelude::*;
 use async_std::{io, task};
 
-/// This represents a tide [Listener](crate::listener::Listener) that
-/// wraps an [async_std::net::TcpListener]. It is implemented as an
-/// enum in order to allow creation of a tide::listener::TcpListener
-/// from a SocketAddr spec that has not yet been bound OR from a bound
-/// TcpListener.
-///
-/// This is currently crate-visible only, and tide users are expected
-/// to create these through [ToListener](crate::ToListener) conversions.
 pub struct TcpListener<State> {
     addrs: Option<Vec<SocketAddr>>,
     listener: Option<net::TcpListener>,
@@ -67,14 +59,14 @@ where
     State: Clone + Send + Sync + 'static,
 {
     async fn bind(&mut self, server: Server<State>) -> io::Result<()> {
-        assert!(self.server.is_none(), "`bind` should only be called once");
+        assert!(self.server.is_none(), "`bind`只能调用一次");
         self.server = Some(server);
 
         if self.listener.is_none() {
             let addrs = self
                 .addrs
                 .take()
-                .expect("`bind` should only be called once");
+                .expect("`bind` 只能调用一次");
             let listener = net::TcpListener::bind(addrs.as_slice()).await?;
             self.listener = Some(listener);
         }
@@ -92,11 +84,11 @@ where
         let server = self
             .server
             .take()
-            .expect("`Listener::bind` must be called before `Listener::accept`");
+            .expect("`Listener::bind` 必须在之前调用 `Listener::accept`");
         let listener = self
             .listener
             .take()
-            .expect("`Listener::bind` must be called before `Listener::accept`");
+            .expect("`Listener::bind` 必须在之前调用 `Listener::accept`");
 
         let mut incoming = listener.incoming();
 
@@ -105,7 +97,7 @@ where
                 Err(ref e) if is_transient_error(e) => continue,
                 Err(error) => {
                     let delay = std::time::Duration::from_millis(500);
-                    crate::log::error!("Error: {}. Pausing for {:?}.", error, delay);
+                    crate::log::error!("Error: {}. for {:?}.", error, delay);
                     task::sleep(delay).await;
                     continue;
                 }
@@ -148,7 +140,7 @@ impl<State> Display for TcpListener<State> {
         let http_fmt = |a| format!("http://{}", a);
         match &self.listener {
             Some(listener) => {
-                let addr = listener.local_addr().expect("Could not get local addr");
+                let addr = listener.local_addr().expect("无法获取本地地址");
                 write!(f, "{}", http_fmt(&addr))
             }
             None => match &self.addrs {
@@ -156,7 +148,7 @@ impl<State> Display for TcpListener<State> {
                     let addrs = addrs.iter().map(http_fmt).collect::<Vec<_>>().join(", ");
                     write!(f, "{}", addrs)
                 }
-                None => write!(f, "Not listening. Did you forget to call `Listener::bind`?"),
+                None => write!(f, "没有监听，请检查是否成功调用了 `Listener::bind`?"),
             },
         }
     }

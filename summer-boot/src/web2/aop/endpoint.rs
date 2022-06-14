@@ -8,47 +8,42 @@ use http_types::Result;
 
 use utils::middleware::Next;
 
-/// An HTTP request handler.
+/// HTTP请求处理。
 ///
-/// This trait is automatically implemented for `Fn` types, and so is rarely implemented
-/// directly by Tide users.
+/// 这个特效是为了 `Fn` 类型自动实现的，所以很少实现，由开发者提供
 ///
-/// In practice, endpoints are functions that take a `Request<State>` as an argument and
-/// return a type `T` that implements `Into<Response>`.
+/// 实际上 endpoint是用`Request<State>`作为参数的函数，然后将实现的类型`T`（泛型）返回`Into<Response>`
 ///
 /// # Examples
 ///
-/// Endpoints are implemented as asynchronous functions that make use of language features
-/// currently only available in Rust Nightly. For this reason, we have to ex&&plicitly enable
-/// the attribute will be omitted in most of the documentation.
-///
-/// A simple endpoint that is invoked on a `GET` request and returns a `String`:
+/// 这里利用的异步函数，但是只有Nightly版本才可以使用，如果要使用的话就需要启用Nightly版本
+/// 这个例子对`GET`请求调用返回`String`
 ///
 /// ```no_run
-/// async fn hello(_req: tide::Request<()>) -> tide::Result<String> {
+/// async fn hello(_req: summer_boot::Request<()>) -> summer_boot::Result<String> {
 ///     Ok(String::from("hello"))
 /// }
 ///
-/// let mut app = tide::Server::new();
+/// let mut app = summer_boot::new();
 /// app.at("/hello").get(hello);
 /// ```
 ///
-/// An endpoint with similar functionality that does not make use of the `async` keyword would look something like this:
+/// 如果不使用async异步的话，例子如下：
 ///
 /// ```no_run
-/// # use core::future::Future;
-/// fn hello(_req: tide::Request<()>) -> impl Future<Output = tide::Result<String>> {
+/// use core::future::Future;
+/// fn hello(_req: summer_boot::Request<()>) -> impl Future<Output = summer_boot::Result<String>> {
 ///     async_std::future::ready(Ok(String::from("hello")))
 /// }
 ///
-/// let mut app = tide::Server::new();
+/// let mut app = summer_boot::new();
 /// app.at("/hello").get(hello);
 /// ```
 ///
-/// Tide routes will also accept endpoints with `Fn` signatures of this form, but using the `async` keyword has better ergonomics.
+/// summer_boot也可以使用带有`Fn`的endpoint，但是一般建议用async异步
 #[async_trait]
 pub trait Endpoint<State: Clone + Send + Sync + 'static>: Send + Sync + 'static {
-    /// Invoke the endpoint within the given context
+    /// 上下文中调用endpoint
     async fn call(&self, req: Request<State>) -> crate::Result;
 }
 

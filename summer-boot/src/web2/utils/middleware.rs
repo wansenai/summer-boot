@@ -7,13 +7,13 @@ use std::future::Future;
 use std::pin::Pin;
 use aop::endpoint::DynEndpoint;
 
-/// Middleware that wraps around the remaining middleware chain.
+/// 异步中间件trait
 #[async_trait]
 pub trait Middleware<State>: Send + Sync + 'static {
-    /// Asynchronously handle the request, and return a response.
+    /// 异步处理请求并返回响应。
     async fn handle(&self, request: Request<State>, next: Next<'_, State>) -> crate::Result;
 
-    /// Set the middleware's name. By default it uses the type signature.
+    /// 设置中间件的名称。默认情况下，使用类型名字.
     fn name(&self) -> &str {
         std::any::type_name::<Self>()
     }
@@ -36,7 +36,7 @@ where
     }
 }
 
-/// The remainder of a middleware chain, including the endpoint.
+/// 中间件链系列其余部分，包括endpoints。
 #[allow(missing_debug_implementations)]
 pub struct Next<'a, State> {
     pub(crate) endpoint: &'a DynEndpoint<State>,
@@ -44,7 +44,7 @@ pub struct Next<'a, State> {
 }
 
 impl<State: Clone + Send + Sync + 'static> Next<'_, State> {
-    /// Asynchronously execute the remaining middleware chain.
+    /// 异步执行其余的中间件。
     pub async fn run(mut self, req: Request<State>) -> Response {
         if let Some((current, next)) = self.next_middleware.split_first() {
             self.next_middleware = next;

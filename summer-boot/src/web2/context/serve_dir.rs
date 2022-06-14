@@ -12,7 +12,7 @@ pub(crate) struct ServeDir {
 }
 
 impl ServeDir {
-    /// Create a new instance of `ServeDir`.
+    /// 创建一个 `ServeDir` 新的实例。
     pub(crate) fn new(prefix: String, dir: PathBuf) -> Self {
         Self { prefix, dir }
     }
@@ -40,17 +40,17 @@ where
             }
         }
 
-        log::info!("Requested file: {:?}", file_path);
+        log::info!("请求的文件 {:?}", file_path);
 
         let file_path = AsyncPathBuf::from(file_path);
         if !file_path.starts_with(&self.dir) {
-            log::warn!("Unauthorized attempt to read: {:?}", file_path);
+            log::warn!("没有权限尝试读取: {:?}", file_path);
             Ok(Response::new(StatusCode::Forbidden))
         } else {
             match Body::from_file(&file_path).await {
                 Ok(body) => Ok(Response::builder(StatusCode::Ok).body(body).build()),
                 Err(e) if e.kind() == io::ErrorKind::NotFound => {
-                    log::warn!("File not found: {:?}", &file_path);
+                    log::warn!("文件未找到: {:?}", &file_path);
                     Ok(Response::new(StatusCode::NotFound))
                 }
                 Err(e) => Err(e.into()),

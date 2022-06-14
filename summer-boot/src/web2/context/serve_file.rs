@@ -11,7 +11,7 @@ pub(crate) struct ServeFile {
 }
 
 impl ServeFile {
-    /// Create a new instance of `ServeFile`.
+    /// 创建一个 `ServeFile` 新的实例。
     pub(crate) fn init(path: impl AsRef<Path>) -> io::Result<Self> {
         let file = path.as_ref().to_owned().canonicalize()?;
         Ok(Self {
@@ -26,7 +26,7 @@ impl<State: Clone + Send + Sync + 'static> Endpoint<State> for ServeFile {
         match Body::from_file(&self.path).await {
             Ok(body) => Ok(Response::builder(StatusCode::Ok).body(body).build()),
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
-                log::warn!("File not found: {:?}", &self.path);
+                log::warn!("文件未找到: {:?}", &self.path);
                 Ok(Response::new(StatusCode::NotFound))
             }
             Err(e) => Err(e.into()),

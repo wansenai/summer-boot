@@ -16,20 +16,18 @@ use context::serve_file::ServeFile;
 
 use gateway::router::Router;
 
-/// A handle to a route.
+/// A handle to route
 ///
-/// All HTTP requests are made against resources. After using [`Server::at`] (or
-/// [`Route::at`]) to establish a route, the `Route` type can be used to
-/// establish endpoints for various HTTP methods at that path. Also, using
-/// `nest`, it can be used to set up a subrouter.
+/// 所有HTTP请求都是针对资源请求的。
+/// 使用`Server::at` 或者 `Route::at` 创建路由，可以使用 `Route` 类型
+/// 为路径的一些HTTP方法创建endpoints 
 ///
-/// [`Server::at`]: ./struct.Server.html#method.at
 #[allow(missing_debug_implementations)]
 pub struct Route<'a, State> {
     router: &'a mut Router<State>,
     path: String,
     middleware: Vec<Arc<dyn Middleware<State>>>,
-    /// Indicates whether the path of current route is treated as a prefix. Set by
+    /// 是否将当前路由的路径作为前缀
     /// [`strip_prefix`].
     ///
     /// [`strip_prefix`]: #method.strip_prefix
@@ -46,7 +44,7 @@ impl<'a, State: Clone + Send + Sync + 'static> Route<'a, State> {
         }
     }
 
-    /// Extend the route with the given `path`.
+    /// 使用指定 `path` 添加路由。
     pub fn at<'b>(&'b mut self, path: &str) -> Route<'b, State> {
         let mut p = self.path.clone();
 
@@ -66,17 +64,15 @@ impl<'a, State: Clone + Send + Sync + 'static> Route<'a, State> {
         }
     }
 
-    /// Get the current path.
+    /// 获取当前路径
     #[must_use]
     pub fn path(&self) -> &str {
         &self.path
     }
 
-    /// Treat the current path as a prefix, and strip prefixes from requests.
-    ///
-    /// This method is marked unstable as its name might change in the near future.
-    ///
-    /// Endpoints will be given a path with the prefix removed.
+    /// 将当前路径视为前缀，并从请求中去除前缀。
+    /// 这个方法标记为不稳定 unstable，后面需要summer boot 宏增强。
+    /// 给endpoints提供前缀已经删除的路径。
     #[cfg(any(feature = "unstable", feature = "docs"))]
     #[cfg_attr(feature = "docs", doc(cfg(unstable)))]
     pub fn strip_prefix(&mut self) -> &mut Self {
@@ -84,7 +80,7 @@ impl<'a, State: Clone + Send + Sync + 'static> Route<'a, State> {
         self
     }
 
-    /// Apply the given middleware to the current route.
+    /// 将给定中间件作为当前路由。
     pub fn with<M>(&mut self, middleware: M) -> &mut Self
     where
         M: Middleware<State>,
@@ -98,29 +94,29 @@ impl<'a, State: Clone + Send + Sync + 'static> Route<'a, State> {
         self
     }
 
-    /// Reset the middleware chain for the current route, if any.
+    /// 重置当前路由的中间件
     pub fn reset_middleware(&mut self) -> &mut Self {
         self.middleware.clear();
         self
     }
 
-    /// Nest a [`Server`] at the current path.
+    /// 在当前路径上嵌套 [`Server`]。
     ///
     /// # Note
     ///
-    /// The outer server *always* has precedence when disambiguating
-    /// overlapping paths. For example in the following example `/hello` will
-    /// return "Unexpected" to the client
+    /// 其他服务 *始终* 具有优先权
+    /// 重叠路径，这个例子输入 `/hello` 将
+    /// 返回 "Unexpected" 给客户端
     ///
     /// ```no_run
     /// #[async_std::main]
     /// async fn main() -> Result<(), std::io::Error> {
-    ///     let mut app = tide::new();
+    ///     let mut app = summer_boot::new();
     ///     app.at("/hello").nest({
-    ///         let mut example = tide::with_state("world");
+    ///         let mut example = summer_boot::with_state("world");
     ///         example
     ///             .at("/")
-    ///             .get(|req: tide::Request<&'static str>| async move {
+    ///             .get(|req: summer_boot::Request<&'static str>| async move {
     ///                 Ok(format!("Hello {state}!", state = req.state()))
     ///             });
     ///         example
@@ -146,20 +142,18 @@ impl<'a, State: Clone + Send + Sync + 'static> Route<'a, State> {
         self
     }
 
-    /// Serve a directory statically.
+    /// 静态目录服务。
     ///
-    /// Each file will be streamed from disk, and a mime type will be determined
-    /// based on magic bytes.
+    /// 每一个文件都将从磁盘io流传输，并确定了mime类型
     ///
     /// # Security
     ///
-    /// This handler ensures no folders outside the specified folder can be
-    /// served, and attempts to access any path outside this folder (no matter
-    /// if it exists or not) will return `StatusCode::Forbidden` to the caller.
+    /// 这个方法确保了除了指定文件夹下之外的文件的路径
+    /// 无论是否存在都会返回StatusCode::Forbidden
     ///
     /// # Examples
     ///
-    /// Serve the contents of the local directory `./public/images/*` from
+    /// 本地服务提供目录 `./public/images/*` 来自路径
     /// `localhost:8080/images/*`.
     ///
     /// ```no_run
@@ -172,23 +166,23 @@ impl<'a, State: Clone + Send + Sync + 'static> Route<'a, State> {
     /// }
     /// ```
     pub fn serve_dir(&mut self, dir: impl AsRef<Path>) -> io::Result<()> {
-        // Verify path exists, return error if it doesn't.
+        // 验证路径是否存在，如果不存在，则返回错误。
         let dir = dir.as_ref().to_owned().canonicalize()?;
         let prefix = self.path().to_string();
         self.get(ServeDir::new(prefix, dir));
         Ok(())
     }
 
-    /// Serve a static file.
+    /// 提供静态文件。
     ///
-    /// The file will be streamed from disk, and a mime type will be determined
-    /// based on magic bytes. Similar to serve_dir
+    /// 每一个文件都将从磁盘io流传输，并确定了mime类型
+    /// 基于magic bytes。类似serve_dir
     pub fn serve_file(&mut self, file: impl AsRef<Path>) -> io::Result<()> {
         self.get(ServeFile::init(file)?);
         Ok(())
     }
 
-    /// Add an endpoint for the given HTTP method
+    /// 给定HTTP方法添加endpoint
     pub fn method(&mut self, method: http_types::Method, ep: impl Endpoint<State>) -> &mut Self {
         if self.prefix {
             let ep = StripPrefixEndpoint::new(ep);
@@ -208,9 +202,9 @@ impl<'a, State: Clone + Send + Sync + 'static> Route<'a, State> {
         self
     }
 
-    /// Add an endpoint for all HTTP methods, as a fallback.
+    /// 为所有HTTP方法添加一个endpoin，作为回调。
     ///
-    /// Routes with specific HTTP methods will be tried first.
+    /// 尝试使用特定HTTP方法的路由。
     pub fn all(&mut self, ep: impl Endpoint<State>) -> &mut Self {
         if self.prefix {
             let ep = StripPrefixEndpoint::new(ep);
@@ -228,55 +222,55 @@ impl<'a, State: Clone + Send + Sync + 'static> Route<'a, State> {
         self
     }
 
-    /// Add an endpoint for `GET` requests
+    /// 为 `GET` 请求添加endpoint
     pub fn get(&mut self, ep: impl Endpoint<State>) -> &mut Self {
         self.method(http_types::Method::Get, ep);
         self
     }
 
-    /// Add an endpoint for `HEAD` requests
+    /// 为 `HEAD` 请求添加endpoint
     pub fn head(&mut self, ep: impl Endpoint<State>) -> &mut Self {
         self.method(http_types::Method::Head, ep);
         self
     }
 
-    /// Add an endpoint for `PUT` requests
+    /// 为 `PUT` 请求添加endpoint
     pub fn put(&mut self, ep: impl Endpoint<State>) -> &mut Self {
         self.method(http_types::Method::Put, ep);
         self
     }
 
-    /// Add an endpoint for `POST` requests
+    /// 为 `POST` 请求添加endpoint
     pub fn post(&mut self, ep: impl Endpoint<State>) -> &mut Self {
         self.method(http_types::Method::Post, ep);
         self
     }
 
-    /// Add an endpoint for `DELETE` requests
+    /// 为 `DELETE 请求添加endpoint
     pub fn delete(&mut self, ep: impl Endpoint<State>) -> &mut Self {
         self.method(http_types::Method::Delete, ep);
         self
     }
 
-    /// Add an endpoint for `OPTIONS` requests
+    /// 为 `OPTIONS` 请求添加endpoint
     pub fn options(&mut self, ep: impl Endpoint<State>) -> &mut Self {
         self.method(http_types::Method::Options, ep);
         self
     }
 
-    /// Add an endpoint for `CONNECT` requests
+    /// 为 `CONNECT` 请求添加endpoint
     pub fn connect(&mut self, ep: impl Endpoint<State>) -> &mut Self {
         self.method(http_types::Method::Connect, ep);
         self
     }
 
-    /// Add an endpoint for `PATCH` requests
+    /// 为 `PATCH` 请求添加endpoint
     pub fn patch(&mut self, ep: impl Endpoint<State>) -> &mut Self {
         self.method(http_types::Method::Patch, ep);
         self
     }
 
-    /// Add an endpoint for `TRACE` requests
+    /// 为 `TRACE` 请求添加endpoint
     pub fn trace(&mut self, ep: impl Endpoint<State>) -> &mut Self {
         self.method(http_types::Method::Trace, ep);
         self
