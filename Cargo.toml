@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "summer-boot",
+  # other members
   "summer-boot-actuator",
   "summer-boot-autoconfigure",
   "summer-boot-tests",
