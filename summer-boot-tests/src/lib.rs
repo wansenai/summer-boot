@@ -87,7 +87,6 @@ pub fn load_conf() -> Option<GlobalConfig> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use summer_boot::web2::server::server;
   
     #[test]
     fn test_load_env_conf_mysql() {
@@ -96,30 +95,6 @@ mod tests {
         pro.as_ref().map(|a| {
             println!("mysqlConfig:{}", serde_json::to_string(&a.mysql).unwrap());
         });
-    }
-
-    #[tokio::test]
-    async fn test_socket() {
-
-        // let addrs = "127.0.0.1:1337".parse().unwrap();
-
-        // let sa = server::SummerApplication {
-        //     backlog: 5,
-        //     listener: TcpListener::try_into(self),
-        //     addr: addrs,
-        //     sleep_on_errors: true,
-        //     tcp_keepalive_timeout: None,
-        //     tcp_nodelay: false,
-        //     timeout: None,
-        // };
-
-        // server::SummerApplication::run(sa, "127.0.0.1:8080").unwrap();
-    }
-
-    #[tokio::test]
-    async fn test_socket_two() {
-        let addrs = "127.0.0.1:8081".parse().unwrap();
-        server::SummerApplication::bind_two(&addrs);
     }
 }
 
