@@ -32,18 +32,9 @@ async fn test_api(mut req: Request<()>) -> Result {
 }
 ```
 
-
 ```rust
 #[web3]
-#[SummerBootApplication]
-async fn main() {
-    SummerApplication::run();
-}
-```
-
-```rust
-#[web3]
-#[SummerBootApplication]
+#[summer_boot::main]
 async fn main() {
     SummerApplication::run();
 }
