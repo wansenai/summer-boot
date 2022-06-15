@@ -36,7 +36,7 @@ where
     where
         L: ToListener<State>,
     {
-        self.add(listener).expect("Unable to add listener");
+        self.add(listener).expect("无法添加侦听器");
         self
     }
 }
@@ -48,14 +48,14 @@ where
 {
     async fn bind(&mut self, app: Server<State>) -> io::Result<()> {
         for (index, listener) in self.listeners.iter_mut().enumerate() {
-            let listener = listener.as_deref_mut().expect("bind called twice");
+            let listener = listener.as_deref_mut().expect("bind调用了两次");
             match listener.bind(app.clone()).await {
                 Ok(_) => {
                     self.index = Some(index);
                     return Ok(());
                 }
                 Err(e) => {
-                    crate::log::info!("unable to bind", {
+                    crate::log::info!("无法绑定", {
                         listener: listener.to_string(),
                         error: e.to_string()
                     });
@@ -65,20 +65,20 @@ where
 
         Err(io::Error::new(
             io::ErrorKind::AddrNotAvailable,
-            "unable to bind to any supplied listener spec",
+            "无法绑定到任何提供的侦听器",
         ))
     }
 
     async fn accept(&mut self) -> io::Result<()> {
         match self.index {
             Some(index) => {
-                let mut listener = self.listeners[index].take().expect("accept called twice");
+                let mut listener = self.listeners[index].take().expect("accept调用了两次");
                 listener.accept().await?;
                 Ok(())
             }
             None => Err(io::Error::new(
                 io::ErrorKind::AddrNotAvailable,
-                "unable to listen to any supplied listener spec",
+                "无法侦听任何提供的侦听器",
             )),
         }
     }

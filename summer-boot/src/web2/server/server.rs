@@ -213,22 +213,6 @@ where
     ///
     /// # Examples
     ///
-    /// ```no_run
-    /// # use async_std::task::block_on;
-    /// # fn main() -> Result<(), std::io::Error> { block_on(async {
-    /// #
-    /// # use summer_boot::prelude::*;
-    ///
-    /// let mut app = summer_boot::new();
-    /// app.at("/").get(|_| async { Ok("Hello, world!") });
-    /// let mut listener = app.bind("127.0.0.1:8080").await?;
-    /// for info in listener.info().iter() {
-    ///     println!("Server listening on {}", info);
-    /// }
-    /// listener.accept().await?;
-    /// #
-    /// # Ok(()) }) }
-    /// ```
     pub async fn bind<L: ToListener<State>>(
         self,
         listener: L,

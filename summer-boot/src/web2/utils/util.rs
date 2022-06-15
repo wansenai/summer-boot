@@ -4,19 +4,19 @@ use crate::{Middleware, Next, Request, Response};
 pub use async_trait::async_trait;
 use std::future::Future;
 
-/// Define a middleware that operates on incoming requests.
+/// 定义对传入请求进行操作的中间件。
 ///
-/// This middleware is useful because it is not possible in Rust yet to use
-/// closures to define inline middleware.
+/// 用于定义内联中间件的闭包。
 ///
 /// # Examples
 ///
 /// ```rust
-/// use summer_boot::{utils, Request};
+/// use summer_boot::web2::utils::util;
+/// use summer_boot::Request;
 /// use std::time::Instant;
 ///
 /// let mut app = summer_boot::new();
-/// app.with(utils::Before(|mut request: Request<()>| async move {
+/// app.with(util::Before(|mut request: Request<()>| async move {
 ///     request.set_ext(Instant::now());
 ///     request
 /// }));
@@ -37,18 +37,18 @@ where
     }
 }
 
-/// Define a middleware that operates on outgoing responses.
+/// 定义对传出响应进行操作的中间件。
 ///
-/// This middleware is useful because it is not possible in Rust yet to use
-/// closures to define inline middleware.
+/// 用于定义内联中间件的闭包。
 ///
 /// # Examples
 ///
 /// ```rust
-/// use summer_boot::{utils, http, Response};
-///
+/// use summer_boot::web2::utils::util;
+/// use summer_boot::{Response, http};
+/// 
 /// let mut app = summer_boot::new();
-/// app.with(utils::After(|res: Response| async move {
+/// app.with(util::After(|res: Response| async move {
 ///     match res.status() {
 ///         http::StatusCode::NotFound => Ok("Page not found".into()),
 ///         http::StatusCode::InternalServerError => Ok("Something went wrong".into()),

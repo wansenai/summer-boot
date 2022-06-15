@@ -33,21 +33,6 @@ pub trait Accept {
 /// 使用轮询函数创建一个 `Accept` 。
 /// # Example
 ///
-/// ```
-/// use std::task::Poll;
-/// use hyper::server::{accept, Server};
-///
-/// # let mock_conn = ();
-/// // 如果创建一个mock链接...
-/// let mut conn = Some(mock_conn);
-///
-/// // 只接受mock链接一次...
-/// let once = accept::poll_fn(move |cx| {
-///     Poll::Ready(conn.take().map(Ok::<_, ()>))
-/// });
-///
-/// let builder = summer_bot::Server::builder(once);
-/// ```
 pub fn poll_fn<F, IO, E>(func: F) -> impl Accept<Conn = IO, Error = E>
 where
     F: FnMut(&mut task::Context<'_>) -> Poll<Option<Result<IO, E>>>,

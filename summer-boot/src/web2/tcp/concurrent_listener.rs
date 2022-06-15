@@ -28,7 +28,7 @@ impl<State: Clone + Send + Sync + 'static> ConcurrentListener<State> {
     where
         L: ToListener<State>,
     {
-        self.add(listener).expect("Unable to add listener");
+        self.add(listener).expect("无法添加侦听器");
         self
     }
 }

@@ -146,7 +146,7 @@ impl<State> Display for UnixListener<State> {
             }
             None => match &self.path {
                 Some(path) => write!(f, "http+unix://{}", path.display()),
-                None => write!(f, "Not listening. Did you forget to call `Listener::bind`?"),
+                None => write!(f, "没有监听，请检查是否成功调用了 `Listener::bind`?"),
             },
         }
     }

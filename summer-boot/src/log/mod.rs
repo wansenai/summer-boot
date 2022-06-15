@@ -2,8 +2,8 @@
 //!
 //! # Examples
 //!
-//! ```no_run
-//! use tide::log;
+//! ```
+//! use summer_boot::log;
 //!
 //! log::start();
 //!
@@ -21,20 +21,17 @@ pub use kv_log_macro::{max_level, Level};
 
 mod middleware;
 
-#[cfg(feature = "logger")]
 pub use femme::LevelFilter;
 
 pub use middleware::LogMiddleware;
 
 /// Start logging.
-#[cfg(feature = "logger")]
 pub fn start() {
     femme::start();
     crate::log::info!("Logger started", { level: "Info" });
 }
 
 /// Start logging with a log level.
-#[cfg(feature = "logger")]
 pub fn with_level(level: LevelFilter) {
     femme::with_level(level);
     crate::log::info!("Logger started", { level: format!("{}", level) });

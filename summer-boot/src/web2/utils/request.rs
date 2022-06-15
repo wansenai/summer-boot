@@ -459,8 +459,8 @@ impl<State> Request<State> {
     /// 将请求主体解析为表单
     ///
     /// ```rust
+    /// use serde::Deserialize;
     /// # fn main() -> Result<(), std::io::Error> { async_std::task::block_on(async {
-    /// use summer_boot::prelude::*;
     /// let mut app = summer_boot::new();
     ///
     /// #[derive(Deserialize)]
