@@ -1,26 +1,24 @@
 use crate::log;
 use crate::{Middleware, Next, Request};
 
-/// Log all incoming requests and responses.
+/// 记录所有传入的请求和响应
 ///
-/// This middleware is enabled by default in Tide. In the case of
-/// nested applications, this middleware will only run once for each
-/// request.
+/// 此中间件在Summer Boot中默认启用
 ///
 /// # Examples
 ///
 /// ```
 /// let mut app = summer_boot::new();
-/// app.with(summer_boot::log::LogMiddleware::new());
+/// app.with(summer_boot::log::LoggingSystem::new());
 /// ```
 #[derive(Debug, Default, Clone)]
-pub struct LogMiddleware {
+pub struct LoggingSystem {
     _priv: (),
 }
 
-struct LogMiddlewareHasBeenRun;
+struct LoggingSystemHasBeenRun;
 
-impl LogMiddleware {
+impl LoggingSystem {
     /// Create a new instance of `LogMiddleware`.
     #[must_use]
     pub fn new() -> Self {
@@ -33,10 +31,10 @@ impl LogMiddleware {
         mut req: Request<State>,
         next: Next<'a, State>,
     ) -> crate::Result {
-        if req.ext::<LogMiddlewareHasBeenRun>().is_some() {
+        if req.ext::<LoggingSystemHasBeenRun>().is_some() {
             return Ok(next.run(req).await);
         }
-        req.set_ext(LogMiddlewareHasBeenRun);
+        req.set_ext(LoggingSystemHasBeenRun);
 
         let path = req.url().path().to_owned();
         let method = req.method().to_string();
@@ -96,7 +94,7 @@ impl LogMiddleware {
 }
 
 #[async_trait::async_trait]
-impl<State: Clone + Send + Sync + 'static> Middleware<State> for LogMiddleware {
+impl<State: Clone + Send + Sync + 'static> Middleware<State> for LoggingSystem {
     async fn handle(&self, req: Request<State>, next: Next<'_, State>) -> crate::Result {
         self.log(req, next).await
     }

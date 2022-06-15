@@ -3,6 +3,7 @@ use async_std::io;
 
 /// ToListener 可以转换为
 /// [`Listener`](crate::listener::Listener)，实现的任何类型。
+/// 现实可以看to_listener_impls
 ///
 pub trait ToListener<State: Clone + Send + Sync + 'static> {
     /// 转换具体哪一种类型的Listener
