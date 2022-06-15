@@ -14,6 +14,7 @@ pub use utils::middleware::{Middleware, Next};
 pub use utils::request::Request;
 pub use utils::response::Response;
 pub use utils::response_builder::ResponseBuilder;
+pub use utils::util;
 
 pub use http_types::{self as http, Body, Error, Status, StatusCode};
 pub use aop::endpoint::Endpoint;

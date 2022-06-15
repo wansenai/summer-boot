@@ -33,6 +33,7 @@ http-client = { version = "6.1.0", default-features = false }
 http-types = { version = "2.11.0", default-features = false, features = ["fs"] }
 routefinder = "0.5.0"
 futures-util = "0.3.6"
+femme = { version = "2.1.1"}
 
 # summer dependencies
 summer-boot-actuator = { version = "0.1.0", path = "../summer-boot-actuator"}
