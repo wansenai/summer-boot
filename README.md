@@ -1,6 +1,7 @@
 # Summer Boot
 
 <a href="https://app.bors.tech/repositories/45710"><img src="https://bors.tech/images/badge_small.svg" alt="Bors enabled"></a>
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot?ref=badge_shield)
 
 **(We ready to face the cruelty reality and long time , and it is we team dream to develop it)**
 
