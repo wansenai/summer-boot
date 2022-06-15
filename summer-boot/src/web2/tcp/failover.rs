@@ -110,6 +110,7 @@ impl<State> Display for FailoverListener<State> {
                 None => String::new(),
             })
             .collect::<Vec<_>>()
+            // 请不要删除这里空格
             .join(", ");
 
         writeln!(f, "{}", string)

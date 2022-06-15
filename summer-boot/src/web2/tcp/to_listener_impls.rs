@@ -36,7 +36,8 @@ where
             "tcp" | "http" => Ok(ParsedListener::Tcp(TcpListener::from_addrs(
                 self.socket_addrs(|| Some(80))?,
             ))),
-
+            
+            // 后续考虑支持ssl正在封装，tls暂时不做处理
             "tls" | "ssl" | "https" => Err(io::Error::new(
                 io::ErrorKind::Other,
                 "尚不支持解析TLS侦听器",
