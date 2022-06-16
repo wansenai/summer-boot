@@ -5,6 +5,6 @@ members = [
   "summer-boot-actuator",
   "summer-boot-autoconfigure",
   "summer-boot-tests",
-  "summer-boot-codegen",
+  "summer-boot-macro",
   "summer-boot-tools",
 ]

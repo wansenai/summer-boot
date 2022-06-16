@@ -1,5 +1,5 @@
 [package]
-name = "summer-boot-codegen"
+name = "summer-boot-macro"
 version = "0.1.0"
 edition = "2021"
 

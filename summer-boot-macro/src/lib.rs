@@ -3,7 +3,7 @@
 //! 使用运行时宏来设置summerboot async运行时。参见[main]宏文档。
 //!
 //! ```
-//! #[summer_boot_codegen::main] // 或者 `#[summer_boot::main]`
+//! #[summer_boot_macro::main] // 或者 `#[summer_boot::main]`
 //! async fn main() {
 //!     async { println!("Hello world"); }.await
 //! }
@@ -29,7 +29,7 @@ pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
     let vis = &input.vis;
     let sig = &mut input.sig;
     let body = &input.block;
-    let name = &sig.ident;
+    let _name = &sig.ident;
 
     if sig.asyncness.is_none() {
         return syn::Error::new_spanned(sig.fn_token, "仅支持 async fn")
