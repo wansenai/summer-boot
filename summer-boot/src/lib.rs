@@ -40,12 +40,12 @@ pub type Result<T = Response> = std::result::Result<T, Error>;
 pub mod rt;
 
 /// 建立过程宏与summer boot的关联
-macro_rules! codegen_reexport {
+macro_rules! macro_reexport {
     ($name:ident) => {
         #[cfg(feature = "macros")]
         #[cfg_attr(docsrs, doc(cfg(feature = "macros")))]
-        pub use summer_boot_codegen::$name;
+        pub use summer_boot_macro::$name;
     };
 }
 
-codegen_reexport!(main);
+macro_reexport!(main);

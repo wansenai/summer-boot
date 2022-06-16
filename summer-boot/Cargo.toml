@@ -13,7 +13,7 @@ license = "Apache-2.0"
 default = ["macros"]
 
 macros = [
-    "summer-boot-codegen"
+    "summer-boot-macro"
 ]
 
 [dependencies]
@@ -37,4 +37,4 @@ femme = { version = "2.1.1"}
 
 # summer dependencies
 summer-boot-actuator = { version = "0.1.0", path = "../summer-boot-actuator"}
-summer-boot-codegen = { version = "0.1.0", path = "../summer-boot-codegen", optional = true }
+summer-boot-macro = { version = "0.1.0", path = "../summer-boot-macro", optional = true }
