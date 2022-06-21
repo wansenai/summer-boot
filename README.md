@@ -6,6 +6,20 @@
 The next generation decentralized web framework allows users to manage and share their own data. 
 It will be a wide area and cross regional web framework.
 
+```rust
+summer_boot::log Logger started
+summer_boot::log 
+    _____                                       ____              _   
+   / ____|                                     |  _ \            | |  
+  | (___  _   _ _ __ ___  _ __ ___   ___ _ __  | |_) | ___   ___ | |_ 
+   \___ \| | | | '_ ` _ \| '_ ` _ \ / _ \ '__| |  _ < / _ \ / _ \| __|
+   ____) | |_| | | | | | | | | | | |  __/ |    | |_) | (_) | (_) | |_ 
+  |_____/ \__,_|_| |_| |_|_| |_| |_|\___|_|    |____/ \___/ \___/ \__|
+                                                                      
+  :: Summer Boot Version::             (0.1.0)                                                                    
+ 
+summer_boot::web2::server::server Server listening on http://127.0.0.1:8080
+```
 
 ## Quick Start
 
