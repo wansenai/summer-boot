@@ -63,24 +63,6 @@ impl<State> Request<State> {
     }
 
     /// 访问请求的完整URI方法。
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # use async_std::task::block_on;
-    /// # fn main() -> Result<(), std::io::Error> { block_on(async {
-    /// #
-    /// use summer_boot::Request;
-    ///
-    /// let mut app = summer_boot::new();
-    /// app.at("/").get(|req: Request<()>| async move {
-    ///     assert_eq!(req.url(), &"/".parse::<summer_boot::http::Url>().unwrap());
-    ///     Ok("")
-    /// });
-    /// app.listen("127.0.0.1:8080").await?;
-    /// #
-    /// # Ok(()) })}
-    /// ```
     #[must_use]
     pub fn url(&self) -> &Url {
         self.req.url()
@@ -331,7 +313,7 @@ impl<State> Request<State> {
     ///
     /// ```
     /// use std::collections::HashMap;
-    /// use summer_boot::http::{self, convert::Deserialize};
+    /// use summer_boot::http_types::{self, convert::Deserialize};
     /// use summer_boot::Request;
     ///
     /// // 所有权结构:
@@ -342,7 +324,7 @@ impl<State> Request<State> {
     ///     selections: HashMap<String, String>,
     /// }
     ///
-    /// let req: Request<()> = http::Request::get("https://baidu.com/get?page=2&selections[width]=narrow&selections[height]=tall").into();
+    /// let req: Request<()> = http_types::Request::get("https://baidu.com/get?page=2&selections[width]=narrow&selections[height]=tall").into();
     /// let Index { page, selections } = req.query().unwrap();
     /// assert_eq!(page, 2);
     /// assert_eq!(selections["width"], "narrow");
@@ -355,7 +337,7 @@ impl<State> Request<State> {
     ///     format: &'q str,
     /// }
     ///
-    /// let req: Request<()> = http::Request::get("https://httpbin.org/get?format=bananna").into();
+    /// let req: Request<()> = http_types::Request::get("https://httpbin.org/get?format=bananna").into();
     /// let Query { format } = req.query().unwrap();
     /// assert_eq!(format, "bananna");
     /// ```
