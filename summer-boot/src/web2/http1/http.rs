@@ -158,7 +158,7 @@ where
 
         let method = req.method();
 
-        // Pass the request to the endpoint and encode the response.
+        // 将请求传递给endpoint并对响应进行编码
         let mut res = (self.endpoint)(req).await?;
 
         close_connection |= res

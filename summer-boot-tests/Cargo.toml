@@ -15,6 +15,6 @@ serde_yaml = "0.8"
 serde_json = "1.0.75"
 lazy_static = "1.4.0"
 schemars = "0.8.8"
-summer-boot-codegen = {version = "0.1.0", path = "../summer-boot-codegen"}
+summer-boot-macro = {version = "0.1.0", path = "../summer-boot-macro"}
 summer-boot = {version = "0.1.0", path = "../summer-boot"}
 tokio = { version = "1", features = ["full"]}

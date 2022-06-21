@@ -13,14 +13,10 @@ license = "Apache-2.0"
 default = ["macros"]
 
 macros = [
-    "summer-boot-codegen"
+    "summer-boot-macro"
 ]
 
 [dependencies]
-# summer dependencies
-summer-boot-actuator = { version = "0.1.0", path = "../summer-boot-actuator"}
-summer-boot-codegen = { version = "0.1.0", path = "../summer-boot-codegen", optional = true }
-
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["full"]}
@@ -40,6 +36,11 @@ pin-project-lite = "0.2.4"
 http-types = { version = "2.11.0", default-features = false, features = ["fs"] }
 httparse = "1.6"
 futures-util = "0.3.6"
+
+
+# summer dependencies
+summer-boot-actuator = { version = "0.1.0", path = "../summer-boot-actuator"}
+summer-boot-macro = { version = "0.1.0", path = "../summer-boot-macro", optional = true }
 
 #log
 femme = { version = "2.1.1"}
