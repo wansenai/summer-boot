@@ -48,4 +48,14 @@ macro_rules! macro_reexport {
     };
 }
 
+macro_reexport!(auto_scan);
 macro_reexport!(main);
+macro_reexport!(post);
+macro_reexport!(get);
+macro_reexport!(delete);
+macro_reexport!(put);
+macro_reexport!(head);
+macro_reexport!(options);
+macro_reexport!(connect);
+macro_reexport!(patch);
+macro_reexport!(trace);
