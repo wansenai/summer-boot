@@ -3,13 +3,6 @@
 //! # main
 //! 使用运行时宏来设置summerboot async运行时。参见[main]宏文档。
 //!
-//! ```
-//! #[summer_boot_macro::main] // 或者 `#[summer_boot::main]`
-//! async fn main() {
-//!     async { println!("Hello world"); }.await
-//! }
-//! ```
-//!
 //! # auto_scan
 //! 提供了基础的`auto_scan`功能用于发现并自动注册路由。
 //!
@@ -87,10 +80,10 @@ pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
 /// ```rust
 /// #[summer_boot::auto_scan]
 /// fn main() {
-///     println!("Hello world");
+///     println!("stmt 0");
 ///     let app = summer_boot::new();
 ///                                   // <---- 在这里开始自动注入路由, 印象该注入位置的代码为`input.block.stmts.insert(2, parse_quote! {`
-///     ...
+///     println!("stmt 2");
 /// }
 /// ```
 #[proc_macro_attribute]
