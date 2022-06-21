@@ -38,8 +38,8 @@ struct User {
 #[summer_boot::main]
 async fn main() {
     log::start();
-    let mut app = summer_boot::new();
-    app.listen("127.0.0.1:8080").await.unwrap();
+    let mut application = summer_boot::new();
+    application.listen("127.0.0.1:8080").await.unwrap();
 }
 
 #[summer_boot::post("/test/api")]
