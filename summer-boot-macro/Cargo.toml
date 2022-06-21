@@ -1,0 +1,25 @@
+[package]
+name = "summer-boot-macro"
+version = "0.1.0"
+rust-version = "1.60.0"
+edition = "2021"
+description = "summer boot macro"
+license = "Apache-2.0"
+authors = [
+    "James Zow <Jameszow@163.com>",
+    "Yangandmore <635408602@qq.com>"
+]
+
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "1.0", features = ["full"] }
+toml = "0.5"
+serde = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+summer-boot = { version = "0.1.0", path = "../summer-boot" }
