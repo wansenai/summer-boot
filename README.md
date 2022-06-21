@@ -1,15 +1,13 @@
 # Summer Boot
 
 <a href="https://app.bors.tech/repositories/45710"><img src="https://bors.tech/images/badge_small.svg" alt="Bors enabled"></a>
-
-**(We ready to face the cruelty reality and long time , and it is we team dream to develop it)**
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot?ref=badge_shield)
 
 The next generation decentralized web framework allows users to manage and share their own data. 
-
 It will be a wide area and cross regional web framework.
 
 
-## Future API Example Show
+## Quick Start
 
 ```rust
 use serde::Deserialize;
@@ -34,18 +32,10 @@ async fn test_api(mut req: Request<()>) -> Result {
 }
 ```
 
-```rust
-#[web3]
-#[summer_boot::main]
-async fn main() {
-    SummerApplication::run();
-}
-```
+## License
 
-```rust
-#[ResutController]
-#[RequestMapping("api")]
-async trait Api{
-    // do something
-}
-```
+Licensed under either of
+
+- [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot?ref=badge_large)
