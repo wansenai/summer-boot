@@ -29,11 +29,31 @@ pub use logging_system::LoggingSystem;
 /// 开启日志记录
 pub fn start() {
     femme::start();
-    crate::log::info!("Logger started", { level: "Info" });
+    crate::log::info!("Logger started");
+    crate::log::info!("
+    _____                                       ____              _   
+   / ____|                                     |  _ \\            | |  
+  | (___  _   _ _ __ ___  _ __ ___   ___ _ __  | |_) | ___   ___ | |_ 
+   \\___ \\| | | | '_ ` _ \\| '_ ` _ \\ / _ \\ '__| |  _ < / _ \\ / _ \\| __|
+   ____) | |_| | | | | | | | | | | |  __/ |    | |_) | (_) | (_) | |_ 
+  |_____/ \\__,_|_| |_| |_|_| |_| |_|\\___|_|    |____/ \\___/ \\___/ \\__|
+                                                                      
+  :: Summer Boot Version::             (0.1.0)                                                                    
+ ");
 }
 
 /// 使用日志级别开启日志记录
 pub fn with_level(level: LevelFilter) {
     femme::with_level(level);
     crate::log::info!("Logger started", { level: format!("{}", level) });
+    crate::log::info!("
+    _____                                       ____              _   
+   / ____|                                     |  _ \\            | |  
+  | (___  _   _ _ __ ___  _ __ ___   ___ _ __  | |_) | ___   ___ | |_ 
+   \\___ \\| | | | '_ ` _ \\| '_ ` _ \\ / _ \\ '__| |  _ < / _ \\ / _ \\| __|
+   ____) | |_| | | | | | | | | | | |  __/ |    | |_) | (_) | (_) | |_ 
+  |_____/ \\__,_|_| |_| |_|_| |_| |_|\\___|_|    |____/ \\___/ \\___/ \\__|
+                                                                      
+  :: Summer Boot Version::             (0.1.0)                                                                    
+ ");
 }
