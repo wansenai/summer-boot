@@ -89,7 +89,7 @@ pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
 /// fn main() {
 ///     println!("Hello world");
 ///     let app = summer_boot::new();
-///                                     <---- 在这里开始自动注入路由
+///                                 ---- 在这里开始自动注入路由
 ///     ...
 /// }
 /// ```
