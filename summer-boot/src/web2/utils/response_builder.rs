@@ -1,7 +1,7 @@
 use serde::Serialize;
 
-use crate::http::headers::{HeaderName, ToHeaderValues};
-use crate::http::{Body, Mime, StatusCode};
+use crate::http_types::headers::{HeaderName, ToHeaderValues};
+use crate::http_types::{Body, Mime, StatusCode};
 use crate::Response;
 use std::convert::TryInto;
 

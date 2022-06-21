@@ -333,13 +333,6 @@ impl<State: Clone + Sync + Send + 'static, InnerState: Clone + Sync + Send + 'st
     }
 }
 
-#[util::async_trait]
-impl<State: Clone + Send + Sync + Unpin + 'static> http_client::HttpClient for Server<State> {
-    async fn send(&self, req: crate::http::Request) -> crate::http::Result<crate::http::Response> {
-        self.respond(req).await
-    }
-}
-
 #[cfg(test)]
 mod test {
     use crate as summer_boot;

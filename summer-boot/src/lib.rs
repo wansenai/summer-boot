@@ -8,6 +8,7 @@ use web2::{
     gateway,
     context,
     tcp,
+    http1,
 };
 
 pub use utils::middleware::{Middleware, Next};
@@ -15,8 +16,9 @@ pub use utils::request::Request;
 pub use utils::response::Response;
 pub use utils::response_builder::ResponseBuilder;
 pub use utils::util;
+pub use http1::http;
 
-pub use http_types::{self as http, Body, Error, Status, StatusCode};
+pub use http_types::{self, Body, Error, Status, StatusCode};
 pub use aop::endpoint::Endpoint;
 pub use gateway::route::Route;
 
@@ -34,7 +36,7 @@ where
     Server::with_state(state)
 }
 
-/// A specialized Result type for Tide.
+/// 结果类型处理
 pub type Result<T = Response> = std::result::Result<T, Error>;
 
 pub mod rt;

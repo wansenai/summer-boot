@@ -22,6 +22,16 @@ pub(crate) use parsed::ParsedListener;
 pub(crate) use tcp_listener::TcpListener;
 pub(crate) use unix::UnixListener;
 
+#[macro_export]
+macro_rules! read_to_end {
+    ($expr:expr) => {
+        match $expr {
+            Poll::Ready(Ok(0)) => (),
+            other => return other,
+        }
+    };
+}
+
 #[async_trait]
 pub trait Listener<State>: Debug + Display + Send + Sync + 'static
 where
