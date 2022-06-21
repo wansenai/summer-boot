@@ -233,7 +233,7 @@ where
     /// # #[async_std::main]
     /// # async fn main() -> http_types::Result<()> {
     /// #
-    /// use summer_boot::http::{Url, Method, Request, Response};
+    /// use http_types::{Url, Method, Request, Response};
     ///
     /// let mut app = summer_boot::new();
     /// app.at("/").get(|_| async { Ok("hello world") });

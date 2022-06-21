@@ -41,21 +41,6 @@ where
 ///
 /// 用于定义内联中间件的闭包。
 ///
-/// # Examples
-///
-/// ```rust
-/// use summer_boot::web2::utils::util;
-/// use summer_boot::{Response, http};
-/// 
-/// let mut app = summer_boot::new();
-/// app.with(util::After(|res: Response| async move {
-///     match res.status() {
-///         http::StatusCode::NotFound => Ok("Page not found".into()),
-///         http::StatusCode::InternalServerError => Ok("Something went wrong".into()),
-///         _ => Ok(res),
-///     }
-/// }));
-/// ```
 #[derive(Debug)]
 pub struct After<F>(pub F);
 #[async_trait]
