@@ -4,26 +4,15 @@ use std::ops::Index;
 
 use serde::Serialize;
 
-#[cfg(feature = "cookies")]
-use crate::http::cookies::Cookie;
-use crate::http::headers::{self, HeaderName, HeaderValues, ToHeaderValues};
-use crate::http::{self, Body, Error, Mime, StatusCode};
+use crate::http_types::headers::{self, HeaderName, HeaderValues, ToHeaderValues};
+use crate::http_types::{self, Body, Error, Mime, StatusCode};
 use crate::ResponseBuilder;
-
-#[cfg(feature = "cookies")]
-#[derive(Debug)]
-pub(crate) enum CookieEvent {
-    Added(Cookie<'static>),
-    Removed(Cookie<'static>),
-}
 
 /// HTTP response
 #[derive(Debug)]
 pub struct Response {
-    pub(crate) res: http::Response,
+    pub(crate) res: http_types::Response,
     pub(crate) error: Option<Error>,
-    #[cfg(feature = "cookies")]
-    pub(crate) cookie_events: Vec<CookieEvent>,
 }
 
 impl Response {
@@ -34,12 +23,10 @@ impl Response {
         S: TryInto<StatusCode>,
         S::Error: Debug,
     {
-        let res = http::Response::new(status);
+        let res = http_types::Response::new(status);
         Self {
             res,
             error: None,
-            #[cfg(feature = "cookies")]
-            cookie_events: vec![],
         }
     }
 
@@ -213,38 +200,38 @@ impl Response {
     }
 }
 
-impl AsRef<http::Response> for Response {
-    fn as_ref(&self) -> &http::Response {
+impl AsRef<http_types::Response> for Response {
+    fn as_ref(&self) -> &http_types::Response {
         &self.res
     }
 }
 
-impl AsMut<http::Response> for Response {
-    fn as_mut(&mut self) -> &mut http::Response {
+impl AsMut<http_types::Response> for Response {
+    fn as_mut(&mut self) -> &mut http_types::Response {
         &mut self.res
     }
 }
 
-impl AsRef<http::Headers> for Response {
-    fn as_ref(&self) -> &http::Headers {
+impl AsRef<http_types::Headers> for Response {
+    fn as_ref(&self) -> &http_types::Headers {
         self.res.as_ref()
     }
 }
 
-impl AsMut<http::Headers> for Response {
-    fn as_mut(&mut self) -> &mut http::Headers {
+impl AsMut<http_types::Headers> for Response {
+    fn as_mut(&mut self) -> &mut http_types::Headers {
         self.res.as_mut()
     }
 }
 
-impl From<Response> for http::Response {
+impl From<Response> for http_types::Response {
     fn from(response: Response) -> http_types::Response {
         response.res
     }
 }
 
-impl From<http::Body> for Response {
-    fn from(body: http::Body) -> Self {
+impl From<http_types::Body> for Response {
+    fn from(body: http_types::Body) -> Self {
         let mut res = Response::new(200);
         res.set_body(body);
         res
@@ -262,7 +249,7 @@ impl From<serde_json::Value> for Response {
 impl From<Error> for Response {
     fn from(err: Error) -> Self {
         Self {
-            res: http::Response::new(err.status()),
+            res: http_types::Response::new(err.status()),
             error: Some(err),
             #[cfg(feature = "cookies")]
             cookie_events: vec![],
@@ -270,8 +257,8 @@ impl From<Error> for Response {
     }
 }
 
-impl From<http::Response> for Response {
-    fn from(res: http::Response) -> Self {
+impl From<http_types::Response> for Response {
+    fn from(res: http_types::Response) -> Self {
         Self {
             res,
             error: None,
@@ -283,7 +270,7 @@ impl From<http::Response> for Response {
 
 impl From<StatusCode> for Response {
     fn from(status: StatusCode) -> Self {
-        let res: http::Response = status.into();
+        let res: http_types::Response = status.into();
         res.into()
     }
 }

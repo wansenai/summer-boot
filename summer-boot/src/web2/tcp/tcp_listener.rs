@@ -1,7 +1,7 @@
 use super::{is_transient_error, ListenInfo};
 
 use super::Listener;
-use crate::{log, Server};
+use crate::{log, Server, http};
 
 use std::fmt::{self, Display, Formatter};
 
@@ -41,7 +41,7 @@ fn handle_tcp<State: Clone + Send + Sync + 'static>(app: Server<State>, stream: 
         let local_addr = stream.local_addr().ok();
         let peer_addr = stream.peer_addr().ok();
 
-        let fut = async_h1::accept(stream, |mut req| async {
+        let fut = http::accept(stream, |mut req| async {
             req.set_local_addr(local_addr);
             req.set_peer_addr(peer_addr);
             app.respond(req).await
