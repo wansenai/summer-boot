@@ -298,8 +298,7 @@ concat!("
 # use summer_boot::{Request, Result};
 #[summer_boot_macro::", stringify!($method), r#"("/")]
 async fn example(mut req: Request<()>) -> Result {
-    let User { name, age } = req.body_json().await?;
-    Ok(format!("Hello, {}!  {} years old", name, age).into())
+    Ok(format!("Hello World").into())
 }
 ```
 "#);
