@@ -6,12 +6,27 @@
 The next generation decentralized web framework allows users to manage and share their own data. 
 It will be a wide area and cross regional web framework.
 
+```rust
+summer_boot::log Logger started
+summer_boot::log 
+    _____                                       ____              _   
+   / ____|                                     |  _ \            | |  
+  | (___  _   _ _ __ ___  _ __ ___   ___ _ __  | |_) | ___   ___ | |_ 
+   \___ \| | | | '_ ` _ \| '_ ` _ \ / _ \ '__| |  _ < / _ \ / _ \| __|
+   ____) | |_| | | | | | | | | | | |  __/ |    | |_) | (_) | (_) | |_ 
+  |_____/ \__,_|_| |_| |_|_| |_| |_|\___|_|    |____/ \___/ \___/ \__|
+                                                                      
+  :: Summer Boot Version::             (0.1.0)                                                                    
+ 
+summer_boot::web2::server::server Server listening on http://127.0.0.1:8080
+```
 
 ## Quick Start
 
 ```rust
 use serde::Deserialize;
 use summer_boot::{Request, Result};
+use summer_boot::log;
 
 #[derive(Debug, Deserialize)]
 struct User {
@@ -19,13 +34,15 @@ struct User {
     age: u16,
 }
 
+#[summer_boot::auto_scan]
 #[summer_boot::main]
 async fn main() {
-    let mut app = summer_boot::new();
-    app.at("/test/api").post(test_api);
-    app.listen("127.0.0.1:8080").await.unwrap();
+    log::start();
+    let mut application = summer_boot::new();
+    application.listen("127.0.0.1:8080").await.unwrap();
 }
 
+#[summer_boot::post("/test/api")]
 async fn test_api(mut req: Request<()>) -> Result {
     let User { name, age } = req.body_json().await?;
     Ok(format!("Hello, {}!  {} years old", name, age).into())
