@@ -40,7 +40,7 @@ pub async fn run() -> io::Result<()>
 
 pub fn with_state<State>(state: State) -> Server<State>
 where
-    State: Clone + Copy + Send + Sync + 'static,
+    State: Clone + Send + Sync + 'static,
 {
     Server::with_state(state)
 }
