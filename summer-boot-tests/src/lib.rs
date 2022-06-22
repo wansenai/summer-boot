@@ -3,7 +3,6 @@ use schemars::schema::RootSchema;
 use serde_yaml::from_str as yaml_from_str;
 use serde_json::{from_str as json_from_str, to_string_pretty};
 use std::fs::read_to_string;
-use tokio::net::TcpListener;
 #[derive(Serialize, Deserialize,Debug)]
 pub struct GlobalConfig {
     pub mysql: Mysql,
@@ -84,6 +83,7 @@ pub fn load_conf() -> Option<GlobalConfig> {
     }
     None
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;

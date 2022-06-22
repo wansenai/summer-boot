@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use summer_boot::{Request, Result};
-use summer_boot::log;
+use serde_json::Value;
 
 #[derive(Debug, Deserialize)]
 struct User {
@@ -8,12 +8,9 @@ struct User {
     age: u16,
 }
 
-#[summer_boot::auto_scan]
 #[summer_boot::main]
 async fn main() {
-    log::start();
-    let mut app = summer_boot::new();
-    app.listen("127.0.0.1:8080").await.unwrap();
+    summer_boot::run().await.unwrap();
 }
 
 #[summer_boot::post("/test/api")]
