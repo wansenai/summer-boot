@@ -11,3 +11,7 @@ mysql:
   pool_max_open: 32
   #连接超时时间单位秒
   timeout_seconds: 15
+
+server:
+  port: 7798
+  context_path: /
