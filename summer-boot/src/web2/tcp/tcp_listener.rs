@@ -1,7 +1,7 @@
 use super::{is_transient_error, ListenInfo};
 
 use super::Listener;
-use crate::{log, Server, http};
+use crate::{http, log, Server};
 
 use std::fmt::{self, Display, Formatter};
 
@@ -63,10 +63,7 @@ where
         self.server = Some(server);
 
         if self.listener.is_none() {
-            let addrs = self
-                .addrs
-                .take()
-                .expect("`bind` 只能调用一次");
+            let addrs = self.addrs.take().expect("`bind` 只能调用一次");
             let listener = net::TcpListener::bind(addrs.as_slice()).await?;
             self.listener = Some(listener);
         }

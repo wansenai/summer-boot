@@ -1,8 +1,8 @@
 use super::decode::ChunkedDecoder;
 
+use async_dup::{Arc, Mutex};
 use async_std::io::{BufReader, Read, Take};
 use async_std::task::{Context, Poll};
-use async_dup::{Arc, Mutex};
 use std::{fmt::Debug, io, pin::Pin};
 
 pub enum BodyReader<IO: Read + Unpin> {

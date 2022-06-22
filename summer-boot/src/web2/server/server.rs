@@ -1,7 +1,7 @@
 //! HTTP server
-use crate::tcp;
-use crate::log;
 use crate::gateway;
+use crate::log;
+use crate::tcp;
 use crate::utils;
 use crate::{Endpoint, Request, Route};
 
@@ -9,9 +9,9 @@ use async_std::io;
 use async_std::sync::Arc;
 use serde_json::Value;
 
+use gateway::router::{Router, Selection};
 use tcp::{Listener, ToListener};
 use utils::middleware::{Middleware, Next};
-use gateway::router::{Router, Selection};
 
 use summer_boot_autoconfigure;
 
@@ -22,8 +22,8 @@ use summer_boot_autoconfigure;
 /// - 服务器状态是用户定义的，通过 [`summer_boot::Server::with_state`] 函数使用. 这个
 /// 状态可以用于所有应用 endpoints 共享引用.
 ///
-/// - Endpoints 提供与指定URL [`summer_boot::Server::at`] 创建一个 *路由* 
-/// 然后可以用于绑定注册到 endpoints 
+/// - Endpoints 提供与指定URL [`summer_boot::Server::at`] 创建一个 *路由*
+/// 然后可以用于绑定注册到 endpoints
 /// 对于指定HTTP请求类型进行使用
 ///
 /// - Middleware 通过附加request或
@@ -61,34 +61,31 @@ impl Server<()> {
         Self::with_state(())
     }
 
-
     /// 创建一个summer boot web2 server.
-    /// 
+    ///
     /// 默认开启日志记录
     /// 读取yml然后绑定监听
-    /// 
+    ///
     pub async fn run() -> io::Result<()> {
         log::start();
         let server = Self::with_state(());
 
         let mut listener_addr = String::from("0.0.0.0:");
-        
+
         let config = summer_boot_autoconfigure::load_conf();
 
         if let Some(config) = config {
             let read_server = serde_json::to_string(&config.server).unwrap();
-    
+
             let v: Value = serde_json::from_str(&read_server).unwrap();
             let port = v["port"].to_string();
             listener_addr.push_str(&port);
-        }    
+        }
 
         server.listen(listener_addr).await.unwrap();
-        
+
         Ok(())
     }
-
-
 }
 
 impl Default for Server<()> {
@@ -150,7 +147,7 @@ where
     /// 一种“目录”方法，可以方便地查看总体
     /// 应用程序结构。Endpoints仅由path和HTTP方法选择
     /// 请求：路径决定资源和HTTP请求所选资源的各个endpoints。
-    /// 
+    ///
     /// #Example:
     ///
     /// ```rust,no_run
@@ -177,8 +174,7 @@ where
     /// 没有备用路由匹配，即资源已满
     /// 匹配和没有匹配，意味着添加资源的顺序没有
     pub fn at<'a>(&'a mut self, path: &str) -> Route<'a, State> {
-        let router = Arc::get_mut(&mut self.router)
-            .expect("服务器启动后无法注册路由");
+        let router = Arc::get_mut(&mut self.router).expect("服务器启动后无法注册路由");
         Route::new(router, path.to_owned())
     }
 
@@ -229,9 +225,9 @@ where
     }
 
     /// 开发中 todo
-    /// 
+    ///
     /// 异步绑定侦听器。
-    /// 
+    ///
     /// 绑定侦听器。这将打开网络端口，但没有接受传入的连接。
     /// 应调用 `Listener::listen` 开始连接
     ///

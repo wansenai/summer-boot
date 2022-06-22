@@ -1,11 +1,11 @@
 use crate::aop;
 use crate::{Request, Response};
 
-use std::sync::Arc;
+use aop::endpoint::DynEndpoint;
 use async_trait::async_trait;
 use std::future::Future;
 use std::pin::Pin;
-use aop::endpoint::DynEndpoint;
+use std::sync::Arc;
 
 /// 异步中间件trait
 #[async_trait]
