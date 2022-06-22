@@ -1,16 +1,19 @@
-use serde::{Deserialize, Serialize};
 use schemars::schema::RootSchema;
-use serde_yaml::from_str as yaml_from_str;
+use serde::{Deserialize, Serialize};
 use serde_json::{from_str as json_from_str, to_string_pretty};
-use std::{fs::{read_to_string, self}, io::Read};
+use serde_yaml::from_str as yaml_from_str;
+use std::{
+    fs::{self, read_to_string},
+    io::Read,
+};
 
-#[derive(Serialize, Deserialize,Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GlobalConfig {
     pub mysql: Mysql,
     pub server: Server,
 }
 
-#[derive(Debug,Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Mysql {
     pub host: String,
     pub port: u32,
@@ -22,7 +25,7 @@ pub struct Mysql {
     pub timeout_seconds: u64,
 }
 
-#[derive(Debug,Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Server {
     pub port: u32,
     pub context_path: String,
@@ -58,7 +61,7 @@ struct Name {
 
 ///
 /// 获取toml package_name
-/// 
+///
 fn get_package_name() -> String {
     let mut cargo_toml = fs::File::open("Cargo.toml").unwrap();
     let mut content = String::new();
@@ -84,14 +87,14 @@ fn get_package_name() -> String {
                 return package.name;
             }
         }
-    } 
+    }
 
     String::from("_")
 }
 
 ///
 /// 加载环境配置
-/// 
+///
 pub fn load_env_conf() -> Option<EnvConfig> {
     let package_name = get_package_name();
 
@@ -99,13 +102,18 @@ pub fn load_env_conf() -> Option<EnvConfig> {
 
     println!("{}", path);
 
-    let schema = yaml_from_str::<RootSchema>(
-        &read_to_string(&path).unwrap_or_else(|_| panic!("Error loading configuration file {}, please check the configuration!", &path)),
-    );
+    let schema = yaml_from_str::<RootSchema>(&read_to_string(&path).unwrap_or_else(|_| {
+        panic!(
+            "Error loading configuration file {}, please check the configuration!",
+            &path
+        )
+    }));
     return match schema {
         Ok(json) => {
-            let data = to_string_pretty(&json).expect("resources/application.yml file data error！");
-            let p: EnvConfig = json_from_str(&*data).expect("Failed to transfer JSON data to EnvConfig object！");
+            let data =
+                to_string_pretty(&json).expect("resources/application.yml file data error！");
+            let p: EnvConfig =
+                json_from_str(&*data).expect("Failed to transfer JSON data to EnvConfig object！");
             return Some(p);
         }
         Err(err) => {
@@ -117,20 +125,29 @@ pub fn load_env_conf() -> Option<EnvConfig> {
 
 ///
 /// 根据环境配置加载全局配置
-/// 
+///
 /// action  dev 开始环境 test 测试环境 prod 生产环境
-/// 
+///
 pub fn load_global_config(action: String) -> Option<GlobalConfig> {
     let package_name = get_package_name();
 
     let path = format!("{}/src/resources/application-{}.yml", package_name, &action);
-    let schema = yaml_from_str::<RootSchema>(
-        &read_to_string(&path).unwrap_or_else(|_| panic!("Error loading configuration file {}, please check the configuration!", &path)),
-    );
+    let schema = yaml_from_str::<RootSchema>(&read_to_string(&path).unwrap_or_else(|_| {
+        panic!(
+            "Error loading configuration file {}, please check the configuration!",
+            &path
+        )
+    }));
     return match schema {
         Ok(json) => {
-            let data = to_string_pretty(&json).unwrap_or_else(|_| panic!("{} file data error！, please check the configuration!", path));
-            let p = json_from_str(&*data).expect("Failed to transfer JSON data to BriefProConfig object！");
+            let data = to_string_pretty(&json).unwrap_or_else(|_| {
+                panic!(
+                    "{} file data error！, please check the configuration!",
+                    path
+                )
+            });
+            let p = json_from_str(&*data)
+                .expect("Failed to transfer JSON data to BriefProConfig object！");
             return Some(p);
         }
         Err(err) => {
@@ -140,9 +157,9 @@ pub fn load_global_config(action: String) -> Option<GlobalConfig> {
     };
 }
 
-/// 
+///
 /// 先加载环境配置 在根据当前加载的环境 去加载相应的信息
-/// 
+///
 pub fn load_conf() -> Option<GlobalConfig> {
     if let Some(init) = load_env_conf() {
         return load_global_config(init.profiles.active);

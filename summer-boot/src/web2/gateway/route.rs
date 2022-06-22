@@ -1,7 +1,7 @@
 use crate::aop;
 use crate::context;
-use crate::log;
 use crate::gateway;
+use crate::log;
 use crate::utils;
 
 use std::fmt::Debug;
@@ -10,9 +10,9 @@ use std::path::Path;
 use std::sync::Arc;
 
 use aop::endpoint::{Endpoint, MiddlewareEndpoint};
-use utils::middleware::Middleware;
 use context::serve_dir::ServeDir;
 use context::serve_file::ServeFile;
+use utils::middleware::Middleware;
 
 use gateway::router::Router;
 
@@ -20,7 +20,7 @@ use gateway::router::Router;
 ///
 /// 所有HTTP请求都是针对资源请求的。
 /// 使用`Server::at` 或者 `Route::at` 创建路由，可以使用 `Route` 类型
-/// 为路径的一些HTTP方法创建endpoints 
+/// 为路径的一些HTTP方法创建endpoints
 ///
 #[allow(missing_debug_implementations)]
 pub struct Route<'a, State> {

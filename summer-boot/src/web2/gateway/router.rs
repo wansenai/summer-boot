@@ -6,7 +6,6 @@ use std::collections::HashMap;
 
 use aop::endpoint::DynEndpoint;
 
-
 /// `Server` 使用的路由
 ///
 /// 底层, 每个HTTP方法都有一个单独的状态；索引

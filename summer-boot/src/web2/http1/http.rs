@@ -1,24 +1,24 @@
 //! HTTP1 connections on the server.
 
 use std::str::FromStr;
-use std::{fmt, pin::Pin, time::Duration, marker::PhantomData};
 use std::task::{Context, Poll};
+use std::{fmt, marker::PhantomData, pin::Pin, time::Duration};
 
-use async_std::io::{BufReader, Read, Write, Take, BufRead, self};
 use async_std::future::{timeout, Future, TimeoutError};
+use async_std::io::{self, BufRead, BufReader, Read, Take, Write};
 use async_std::{prelude::*, task};
 
 use http_types::content::ContentLength;
+use http_types::headers::{CONNECTION, EXPECT, TRANSFER_ENCODING, UPGRADE};
 use http_types::upgrade::Connection;
-use http_types::headers::{EXPECT, TRANSFER_ENCODING, CONNECTION, UPGRADE};
 use http_types::{ensure, ensure_eq, format_err};
 use http_types::{Body, Method, Request, Response, StatusCode, Url};
 
-use async_dup::{Arc, Mutex};
 use async_channel::Sender;
+use async_dup::{Arc, Mutex};
 
-use super::encode::Encoder;
 use super::decode::ChunkedDecoder;
+use super::encode::Encoder;
 
 const MAX_HEADERS: usize = 128;
 const MAX_HEAD_LENGTH: usize = 8 * 1024;
@@ -30,7 +30,6 @@ const HTTP_1_1_VERSION: u8 = 1;
 
 const CONTINUE_HEADER_VALUE: &str = "100-continue";
 const CONTINUE_RESPONSE: &[u8] = b"HTTP/1.1 100 Continue\r\n\r\n";
-
 
 // http1 connection 配置服务器
 #[derive(Debug, Clone)]
@@ -173,7 +172,7 @@ where
         } else {
             None
         };
-        
+
         let mut encoder = Encoder::new(res, method);
 
         let bytes_written = io::copy(&mut encoder, &mut self.io).await?;
@@ -195,7 +194,6 @@ where
         }
     }
 }
-
 
 /// body_reader
 pub enum BodyReader<IO: Read + Unpin> {
@@ -228,18 +226,18 @@ impl<IO: Read + Unpin> Read for BodyReader<IO> {
     }
 
     fn poll_read_vectored(
-            self: Pin<&mut Self>,
-            cx: &mut Context<'_>,
-            bufs: &mut [io::IoSliceMut<'_>],
-        ) -> Poll<io::Result<usize>> {
-            for b in bufs {
-                if !b.is_empty() {
-                    return self.poll_read(cx, b);
-                }
+        self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        bufs: &mut [io::IoSliceMut<'_>],
+    ) -> Poll<io::Result<usize>> {
+        for b in bufs {
+            if !b.is_empty() {
+                return self.poll_read(cx, b);
             }
-
-            self.poll_read(cx, &mut [])
         }
+
+        self.poll_read(cx, &mut [])
+    }
 }
 
 /// read_notifier

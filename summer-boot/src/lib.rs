@@ -1,29 +1,22 @@
-pub mod web2;
 pub mod common;
 pub mod log;
+pub mod web2;
 
 use async_std::io;
 use serde_json::ser::State;
 use web2::tcp::ToListener;
-use web2::{
-    utils,
-    aop,
-    gateway,
-    context,
-    tcp,
-    http1,
-};
+use web2::{aop, context, gateway, http1, tcp, utils};
 
+pub use http1::http;
 pub use utils::middleware::{Middleware, Next};
 pub use utils::request::Request;
 pub use utils::response::Response;
 pub use utils::response_builder::ResponseBuilder;
 pub use utils::util;
-pub use http1::http;
 
-pub use http_types::{self, Body, Error, Status, StatusCode};
 pub use aop::endpoint::Endpoint;
 pub use gateway::route::Route;
+pub use http_types::{self, Body, Error, Status, StatusCode};
 
 use web2::server::server::Server;
 
@@ -33,8 +26,7 @@ pub fn new() -> Server<()> {
 }
 
 /// 自动扫描 日志开启 读取yml
-pub async fn run() -> io::Result<()>
-{
+pub async fn run() -> io::Result<()> {
     Server::run().await
 }
 

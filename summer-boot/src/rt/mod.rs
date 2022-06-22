@@ -8,7 +8,6 @@ use tokio::runtime::Runtime;
 pub struct SummerRuntime;
 
 impl SummerRuntime {
-
     /// 新建 tokio runtime 运行时对象
     pub fn new() -> Runtime {
         tokio::runtime::Runtime::new().unwrap()

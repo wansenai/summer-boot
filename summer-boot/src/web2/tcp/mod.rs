@@ -3,10 +3,10 @@ use crate::Server;
 
 mod concurrent;
 mod failover;
-mod to_listener;
-mod to_listener_impls;
 mod parsed;
 mod tcp_listener;
+mod to_listener;
+mod to_listener_impls;
 mod unix;
 
 use std::fmt::{Debug, Display};

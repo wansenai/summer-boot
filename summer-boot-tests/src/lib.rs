@@ -1,14 +1,14 @@
-use serde::{Deserialize, Serialize};
 use schemars::schema::RootSchema;
-use serde_yaml::from_str as yaml_from_str;
+use serde::{Deserialize, Serialize};
 use serde_json::{from_str as json_from_str, to_string_pretty};
+use serde_yaml::from_str as yaml_from_str;
 use std::fs::read_to_string;
-#[derive(Serialize, Deserialize,Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GlobalConfig {
     pub mysql: Mysql,
 }
 
-#[derive(Debug,Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Mysql {
     pub host: String,
     pub port: u32,
@@ -34,15 +34,18 @@ pub struct EnvConfig {
 加载环境配置
  */
 pub fn load_env_conf() -> Option<EnvConfig> {
-
     let path = format!("src/resources/application.yml");
-    let schema = yaml_from_str::<RootSchema>(
-        &read_to_string(&path).unwrap_or_else(|_| panic!("Error loading configuration file {}, please check the configuration!", &path)),
-    );
+    let schema = yaml_from_str::<RootSchema>(&read_to_string(&path).unwrap_or_else(|_| {
+        panic!(
+            "Error loading configuration file {}, please check the configuration!",
+            &path
+        )
+    }));
     return match schema {
         Ok(json) => {
             let data = to_string_pretty(&json).expect("resources/app.yml file data error！");
-            let p: EnvConfig = json_from_str(&*data).expect("Failed to transfer JSON data to EnvConfig object！");
+            let p: EnvConfig =
+                json_from_str(&*data).expect("Failed to transfer JSON data to EnvConfig object！");
             return Some(p);
         }
         Err(err) => {
@@ -58,13 +61,22 @@ action  dev 开始环境 test 测试环境 prod 生产环境
  */
 pub fn load_global_config(action: String) -> Option<GlobalConfig> {
     let path = format!("src/resources/application-{}.yml", &action);
-    let schema = yaml_from_str::<RootSchema>(
-        &read_to_string(&path).unwrap_or_else(|_| panic!("Error loading configuration file {}, please check the configuration!", &path)),
-    );
+    let schema = yaml_from_str::<RootSchema>(&read_to_string(&path).unwrap_or_else(|_| {
+        panic!(
+            "Error loading configuration file {}, please check the configuration!",
+            &path
+        )
+    }));
     return match schema {
         Ok(json) => {
-            let data = to_string_pretty(&json).unwrap_or_else(|_| panic!("{} file data error！, please check the configuration!", path));
-            let p = json_from_str(&*data).expect("Failed to transfer JSON data to BriefProConfig object！");
+            let data = to_string_pretty(&json).unwrap_or_else(|_| {
+                panic!(
+                    "{} file data error！, please check the configuration!",
+                    path
+                )
+            });
+            let p = json_from_str(&*data)
+                .expect("Failed to transfer JSON data to BriefProConfig object！");
             return Some(p);
         }
         Err(err) => {
@@ -87,14 +99,13 @@ pub fn load_conf() -> Option<GlobalConfig> {
 #[cfg(test)]
 mod tests {
     use super::*;
-  
+
     #[test]
     fn test_load_env_conf_mysql() {
         let pro = load_conf();
-        println!("{:?}",pro);
+        println!("{:?}", pro);
         pro.as_ref().map(|a| {
             println!("mysqlConfig:{}", serde_json::to_string(&a.mysql).unwrap());
         });
     }
 }
-

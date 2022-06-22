@@ -1,5 +1,5 @@
-use crate::{Middleware, Request, Response};
 use crate::utils;
+use crate::{Middleware, Request, Response};
 
 use async_std::future::Future;
 use async_std::sync::Arc;

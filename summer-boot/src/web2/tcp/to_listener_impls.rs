@@ -1,7 +1,7 @@
 use super::UnixListener;
 use super::{ConcurrentListener, FailoverListener, ParsedListener, TcpListener, ToListener};
-use http_types::url::Url;
 use async_std::io;
+use http_types::url::Url;
 use std::net::ToSocketAddrs;
 
 impl<State> ToListener<State> for Url
@@ -36,17 +36,14 @@ where
             "tcp" | "http" => Ok(ParsedListener::Tcp(TcpListener::from_addrs(
                 self.socket_addrs(|| Some(80))?,
             ))),
-            
+
             // 后续考虑支持ssl正在封装，tls暂时不做处理
             "tls" | "ssl" | "https" => Err(io::Error::new(
                 io::ErrorKind::Other,
                 "尚不支持解析TLS侦听器",
             )),
 
-            _ => Err(io::Error::new(
-                io::ErrorKind::InvalidInput,
-                "无法识别的url",
-            )),
+            _ => Err(io::Error::new(io::ErrorKind::InvalidInput, "无法识别的url")),
         }
     }
 }
@@ -326,7 +323,6 @@ mod parse_tests {
         fn str_url_to_unix_listener() {
             let err = listen("http+unix:///var/run/socket").unwrap_err();
             println!("{}", err);
-
         }
 
         #[test]

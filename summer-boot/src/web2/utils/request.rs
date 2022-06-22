@@ -240,7 +240,7 @@ impl<State> Request<State> {
     /// 按名称提取和解析路由参数。
     ///
     /// 以 `&str` 形式返回参数，该参数是从此 `Request` 借用的。
-    /// 
+    ///
     /// 名称应不包括引用 `:`。
     ///
     /// # Errors
@@ -305,7 +305,7 @@ impl<State> Request<State> {
             .find_map(|captures| captures.wildcard())
     }
 
-    /// 
+    ///
     /// 使用[serde_qs](https://docs.rs/serde_qs)将URL查询组件解析为结构
     /// 将整个查询作为未解析的字符串获取，使用 `request.url().query()`。
     ///
@@ -395,7 +395,7 @@ impl<State> Request<State> {
     /// 可以在读取body后调用此方法，但生成空缓冲区。
     ///
     /// # Errors
-    /// 
+    ///
     /// 读取body时遇到的任何I/O错误都会立即返回错误 `Err`
     ///
     /// 如果body不能解释有效的UTF-8，则返回 `Err`
@@ -486,9 +486,8 @@ impl<State> Request<State> {
     /// 如果summer_boot::sessions:SessionMiddleware 没有在运行。
     #[cfg(feature = "sessions")]
     pub fn session(&self) -> &crate::sessions::Session {
-        self.ext::<crate::sessions::Session>().expect(
-            "请求会话未初始化, 是否启用了summer_boot::sessions::SessionMiddleware?",
-        )
+        self.ext::<crate::sessions::Session>()
+            .expect("请求会话未初始化, 是否启用了summer_boot::sessions::SessionMiddleware?")
     }
 
     /// 检索对当前会话的可变引用。
@@ -498,9 +497,8 @@ impl<State> Request<State> {
     /// 如果summer_boot::sessions:SessionMiddleware 没有在运行。
     #[cfg(feature = "sessions")]
     pub fn session_mut(&mut self) -> &mut crate::sessions::Session {
-        self.ext_mut().expect(
-            "请求会话未初始化, 是否启用了summer_boot::sessions::SessionMiddleware?",
-        )
+        self.ext_mut()
+            .expect("请求会话未初始化, 是否启用了summer_boot::sessions::SessionMiddleware?")
     }
 
     /// 获取body流的长度（如果已设置）。

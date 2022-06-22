@@ -1,5 +1,5 @@
 //! 运行时宏处理
-//! 
+//!
 //! # main
 //! 使用运行时宏来设置summerboot async运行时。参见[main]宏文档。
 //!
@@ -11,13 +11,16 @@
 //!
 //!
 
-use std::io::Read;
-use proc_macro::{TokenStream};
+use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::{quote, ToTokens};
-use serde::{Deserialize};
-use syn::{parse_macro_input, parse_quote, parse_file, Item, Meta, NestedMeta, Lit, ItemFn, punctuated::Punctuated, Token};
-use std::{fs};
+use serde::Deserialize;
+use std::fs;
+use std::io::Read;
+use syn::{
+    parse_file, parse_macro_input, parse_quote, punctuated::Punctuated, Item, ItemFn, Lit, Meta,
+    NestedMeta, Token,
+};
 
 /// 用于匹配项目根目录下的 `Cargo.toml` 文件。
 /// 匹配规则为：
@@ -51,7 +54,6 @@ struct Name {
 /// ```
 #[proc_macro_attribute]
 pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
-
     let mut input = parse_macro_input!(item as ItemFn);
     let attrs = &input.attrs;
     let vis = &input.vis;
@@ -72,7 +74,8 @@ pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
             summer_boot::rt::SummerRuntime::new()
             .block_on(async move { #body });
         }
-    }).into()
+    })
+    .into()
 }
 
 /// 完成 summer_boot 项目下的自动扫描功能
@@ -88,7 +91,6 @@ pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_attribute]
 pub fn auto_scan(_: TokenStream, input: TokenStream) -> TokenStream {
-
     let mut project = Vec::<String>::new();
 
     // 找到需要扫描的路径
@@ -109,7 +111,7 @@ pub fn auto_scan(_: TokenStream, input: TokenStream) -> TokenStream {
                 project.push("src".to_string());
             }
         }
-    } 
+    }
 
     let mut input = parse_macro_input!(input as ItemFn);
 
@@ -140,7 +142,6 @@ fn scan(path: &str, input: &mut ItemFn) {
     } else {
         // 判断文件名后缀是否是.rs
         if path.ends_with(".rs") {
-
             // 如果是文件，则处理内部细节
             let mut content = String::new();
             file.read_to_string(&mut content).unwrap();
@@ -176,11 +177,13 @@ fn scan(path: &str, input: &mut ItemFn) {
                                     break;
                                 } else {
                                     // 添加
-                                    input.block.stmts.insert(2, parse_quote! {
-                                        app.at(#url).#method(#fn_path_token_stream);
-                                    });
+                                    input.block.stmts.insert(
+                                        2,
+                                        parse_quote! {
+                                            app.at(#url).#method(#fn_path_token_stream);
+                                        },
+                                    );
                                 }
-
                             }
                         }
                     }
@@ -192,21 +195,22 @@ fn scan(path: &str, input: &mut ItemFn) {
 
 // 配置函数全路径
 fn config_function_path(path: &str, fu_name: &str) -> proc_macro2::TokenStream {
-
     let mut fn_path_idents = Punctuated::<Ident, Token![::]>::new();
     fn_path_idents.push(Ident::new("crate", Span::call_site()));
 
     // 配置函数路径
-    let names: Vec<&str> = (&path[path.find("src/").unwrap() + 4..path.rfind(".rs").unwrap()]).split("/").collect();
+    let names: Vec<&str> = (&path[path.find("src/").unwrap() + 4..path.rfind(".rs").unwrap()])
+        .split("/")
+        .collect();
 
     let len = names.len();
     for (index, name) in names.into_iter().enumerate() {
         if (index + 1) == len {
             // 最后一个文件名称如果是main、lib、test则不需要加入路径
             match name {
-                "main" | "mod"| "lib" => {
+                "main" | "mod" | "lib" => {
                     break;
-                },
+                }
                 _ => {}
             }
         }
@@ -217,46 +221,53 @@ fn config_function_path(path: &str, fu_name: &str) -> proc_macro2::TokenStream {
     }
     // 配置函数名称
     fn_path_idents.push(Ident::new(fu_name, Span::call_site()));
-    
+
     fn_path_idents.to_token_stream()
 }
 
 // 配置请求类型
 fn config_req_type(attr_path: &str) -> Option<Ident> {
-    if attr_path == "summer_boot_macro :: get" 
-    || attr_path == "summer_boot :: get"
-    || attr_path == "get" 
-    || attr_path == "summer_boot_macro :: head" 
-    || attr_path == "summer_boot :: head"
-    || attr_path == "head" 
-    || attr_path == "summer_boot_macro :: put"  
-    || attr_path == "summer_boot :: put"
-    || attr_path == "put" 
-    || attr_path == "summer_boot_macro :: post"  
-    || attr_path == "summer_boot :: post"
-    || attr_path == "post" 
-    || attr_path == "summer_boot_macro :: delete"  
-    || attr_path == "summer_boot :: delete"
-    || attr_path == "delete" 
-    || attr_path == "summer_boot_macro :: head"  
-    || attr_path == "summer_boot :: head"
-    || attr_path == "head"  
-    || attr_path == "summer_boot_macro :: options" 
-    || attr_path == "summer_boot :: options"
-    || attr_path == "options"  
-    || attr_path == "summer_boot_macro :: connect" 
-    || attr_path == "summer_boot :: connect"
-    || attr_path == "connect"  
-    || attr_path == "summer_boot_macro :: patch" 
-    || attr_path == "summer_boot :: patch"
-    || attr_path == "patch" 
-    || attr_path == "summer_boot_macro :: trace" 
-    || attr_path == "summer_boot :: trace"
-    || attr_path == "trace" {
+    if attr_path == "summer_boot_macro :: get"
+        || attr_path == "summer_boot :: get"
+        || attr_path == "get"
+        || attr_path == "summer_boot_macro :: head"
+        || attr_path == "summer_boot :: head"
+        || attr_path == "head"
+        || attr_path == "summer_boot_macro :: put"
+        || attr_path == "summer_boot :: put"
+        || attr_path == "put"
+        || attr_path == "summer_boot_macro :: post"
+        || attr_path == "summer_boot :: post"
+        || attr_path == "post"
+        || attr_path == "summer_boot_macro :: delete"
+        || attr_path == "summer_boot :: delete"
+        || attr_path == "delete"
+        || attr_path == "summer_boot_macro :: head"
+        || attr_path == "summer_boot :: head"
+        || attr_path == "head"
+        || attr_path == "summer_boot_macro :: options"
+        || attr_path == "summer_boot :: options"
+        || attr_path == "options"
+        || attr_path == "summer_boot_macro :: connect"
+        || attr_path == "summer_boot :: connect"
+        || attr_path == "connect"
+        || attr_path == "summer_boot_macro :: patch"
+        || attr_path == "summer_boot :: patch"
+        || attr_path == "patch"
+        || attr_path == "summer_boot_macro :: trace"
+        || attr_path == "summer_boot :: trace"
+        || attr_path == "trace"
+    {
         if attr_path.starts_with("summer_boot_macro ::") {
-            return Some(Ident::new(&attr_path["summer_boot_macro :: ".len()..], Span::call_site()));
+            return Some(Ident::new(
+                &attr_path["summer_boot_macro :: ".len()..],
+                Span::call_site(),
+            ));
         } else if attr_path.starts_with("summer_boot ::") {
-            return Some(Ident::new(&attr_path["summer_boot :: ".len()..], Span::call_site()));
+            return Some(Ident::new(
+                &attr_path["summer_boot :: ".len()..],
+                Span::call_site(),
+            ));
         } else {
             return Some(Ident::new(attr_path, Span::call_site()));
         }
@@ -319,7 +330,7 @@ async fn example(mut req: Request<()>) -> Result {
 
                 (quote! {
                     #(#attrs)*
-                    #vis #sig 
+                    #vis #sig
                         #body
                 }).into()
             }
@@ -327,14 +338,4 @@ async fn example(mut req: Request<()>) -> Result {
     };
 }
 
-method_macro!(
-    get,
-    head,
-    put,
-    post,
-    delete,
-    patch,
-    trace,
-    options,
-    connect,
-);
+method_macro!(get, head, put, post, delete, patch, trace, options, connect,);
