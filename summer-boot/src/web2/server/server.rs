@@ -7,11 +7,13 @@ use crate::{Endpoint, Request, Route};
 
 use async_std::io;
 use async_std::sync::Arc;
+use serde_json::Value;
 
 use tcp::{Listener, ToListener};
 use utils::middleware::{Middleware, Next};
-use utils::util;
 use gateway::router::{Router, Selection};
+
+use summer_boot_autoconfigure;
 
 /// HTTP服务器。
 ///
@@ -58,6 +60,35 @@ impl Server<()> {
     pub fn new() -> Self {
         Self::with_state(())
     }
+
+
+    /// 创建一个summer boot web2 server.
+    /// 
+    /// 默认开启日志记录
+    /// 读取yml然后绑定监听
+    /// 
+    pub async fn run() -> io::Result<()> {
+        log::start();
+        let server = Self::with_state(());
+
+        let mut listener_addr = String::from("0.0.0.0:");
+        
+        let config = summer_boot_autoconfigure::load_conf();
+
+        if let Some(config) = config {
+            let read_server = serde_json::to_string(&config.server).unwrap();
+    
+            let v: Value = serde_json::from_str(&read_server).unwrap();
+            let port = v["port"].to_string();
+            listener_addr.push_str(&port);
+        }    
+
+        server.listen(listener_addr).await.unwrap();
+        
+        Ok(())
+    }
+
+
 }
 
 impl Default for Server<()> {
@@ -107,10 +138,7 @@ where
             router: Arc::new(Router::new()),
             middleware: Arc::new(vec![
                 // 暂时没有使用到cookies
-                #[cfg(feature = "cookies")]
-                Arc::new(cookies::CookiesMiddleware::new()),
-                #[cfg(feature = "logger")]
-                Arc::new(log::LogMiddleware::new()),
+                Arc::new(log::LoggingSystem::new()),
             ]),
             state,
         }
