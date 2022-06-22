@@ -2,6 +2,9 @@ pub mod web2;
 pub mod common;
 pub mod log;
 
+use async_std::io;
+use serde_json::ser::State;
+use web2::tcp::ToListener;
 use web2::{
     utils,
     aop,
@@ -27,6 +30,12 @@ use web2::server::server::Server;
 #[must_use]
 pub fn new() -> Server<()> {
     Server::new()
+}
+
+/// 自动扫描 日志开启 读取yml
+pub async fn run() -> io::Result<()>
+{
+    Server::run().await
 }
 
 pub fn with_state<State>(state: State) -> Server<State>

@@ -3,7 +3,6 @@ use schemars::schema::RootSchema;
 use serde_yaml::from_str as yaml_from_str;
 use serde_json::{from_str as json_from_str, to_string_pretty};
 use std::fs::read_to_string;
-use tokio::net::TcpListener;
 #[derive(Serialize, Deserialize,Debug)]
 pub struct GlobalConfig {
     pub mysql: Mysql,
@@ -36,7 +35,7 @@ pub struct EnvConfig {
  */
 pub fn load_env_conf() -> Option<EnvConfig> {
 
-    let path = format!("src/resources/app.yml");
+    let path = format!("src/resources/application.yml");
     let schema = yaml_from_str::<RootSchema>(
         &read_to_string(&path).unwrap_or_else(|_| panic!("Error loading configuration file {}, please check the configuration!", &path)),
     );
@@ -58,7 +57,7 @@ pub fn load_env_conf() -> Option<EnvConfig> {
 action  dev 开始环境 test 测试环境 prod 生产环境
  */
 pub fn load_global_config(action: String) -> Option<GlobalConfig> {
-    let path = format!("src/resources/app-{}.yml", &action);
+    let path = format!("src/resources/application-{}.yml", &action);
     let schema = yaml_from_str::<RootSchema>(
         &read_to_string(&path).unwrap_or_else(|_| panic!("Error loading configuration file {}, please check the configuration!", &path)),
     );
@@ -84,6 +83,7 @@ pub fn load_conf() -> Option<GlobalConfig> {
     }
     None
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;

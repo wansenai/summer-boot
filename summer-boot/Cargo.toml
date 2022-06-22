@@ -40,6 +40,7 @@ futures-util = "0.3.6"
 
 # summer dependencies
 summer-boot-actuator = { version = "0.1.0", path = "../summer-boot-actuator"}
+summer-boot-autoconfigure = { version = "0.1.0", path = "../summer-boot-autoconfigure"}
 summer-boot-macro = { version = "0.1.0", path = "../summer-boot-macro", optional = true }
 
 #log
