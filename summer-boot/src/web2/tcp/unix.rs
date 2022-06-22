@@ -1,7 +1,7 @@
 use super::{is_transient_error, ListenInfo};
 
 use super::Listener;
-use crate::{log, Server, http};
+use crate::{http, log, Server};
 
 use std::fmt::{self, Display, Formatter};
 

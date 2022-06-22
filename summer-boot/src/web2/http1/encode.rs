@@ -2,17 +2,16 @@ use std::io::Write;
 use std::pin::Pin;
 use std::time::SystemTime;
 
+use crate::read_to_end;
 use async_std::io::{self, Cursor, Read};
 use async_std::task::{Context, Poll};
 use futures_util::ready;
 use http_types::headers::{CONTENT_LENGTH, DATE, TRANSFER_ENCODING};
-use http_types::{Method, Response, Body};
+use http_types::{Body, Method, Response};
 use pin_project::pin_project;
-use crate::read_to_end;
 
 use super::body_encoder::BodyEncoder;
 use super::date::fmt_http_date;
-
 
 #[derive(Debug)]
 pub(crate) enum EncoderState {
@@ -104,7 +103,6 @@ impl Encoder {
         Ok(Cursor::new(head))
     }
 }
-
 
 /// 用于分块编码的编码struct
 #[derive(Debug)]

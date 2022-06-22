@@ -1,6 +1,6 @@
 use serde::Deserialize;
-use summer_boot::{Request, Result};
 use serde_json::Value;
+use summer_boot::{Request, Result};
 
 #[derive(Debug, Deserialize)]
 struct User {

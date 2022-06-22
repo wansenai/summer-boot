@@ -24,10 +24,7 @@ impl Response {
         S::Error: Debug,
     {
         let res = http_types::Response::new(status);
-        Self {
-            res,
-            error: None,
-        }
+        Self { res, error: None }
     }
 
     #[must_use]
@@ -49,9 +46,7 @@ impl Response {
         S: TryInto<StatusCode>,
         S::Error: Debug,
     {
-        let status = status
-            .try_into()
-            .expect("无法转换为有效的 `StatusCode`");
+        let status = status.try_into().expect("无法转换为有效的 `StatusCode`");
 
         self.res.set_status(status);
     }

@@ -37,7 +37,6 @@ impl ResponseBuilder {
         self
     }
 
-
     pub fn body_json(self, json: &impl Serialize) -> crate::Result<Self> {
         Ok(self.body(Body::from_json(json)?))
     }
@@ -46,7 +45,6 @@ impl ResponseBuilder {
         self.body(Body::from_string(string))
     }
 
-   
     pub fn body_bytes(self, bytes: impl AsRef<[u8]>) -> Self {
         self.body(Body::from(bytes.as_ref()))
     }
