@@ -6,11 +6,6 @@
 //!   链接.
 //! - 像 `poll_fn` 这样的程序可以创建自定义的 `Accept`.
 
-#[cfg(feature = "stream")]
-use futures_core::Stream;
-#[cfg(feature = "stream")]
-use pin_project_lite::pin_project;
-
 use crate::common::{
     task::{self, Poll},
     Pin,

@@ -66,25 +66,25 @@ impl Server<()> {
     /// 默认开启日志记录
     /// 读取yml然后绑定监听
     ///
-    pub async fn run() -> io::Result<()> {
+    pub fn run() -> Self {
         log::start();
         let server = Self::with_state(());
 
-        let mut listener_addr = String::from("0.0.0.0:");
+        // let mut listener_addr = String::from("0.0.0.0:");
 
-        let config = summer_boot_autoconfigure::load_conf();
+        // let config = summer_boot_autoconfigure::load_conf();
 
-        if let Some(config) = config {
-            let read_server = serde_json::to_string(&config.server).unwrap();
+        // if let Some(config) = config {
+        //     let read_server = serde_json::to_string(&config.server).unwrap();
 
-            let v: Value = serde_json::from_str(&read_server).unwrap();
-            let port = v["port"].to_string();
-            listener_addr.push_str(&port);
-        }
+        //     let v: Value = serde_json::from_str(&read_server).unwrap();
+        //     let port = v["port"].to_string();
+        //     listener_addr.push_str(&port);
+        // }
 
-        server.listen(listener_addr).await.unwrap();
+        // server.listen(listener_addr).await.unwrap();
 
-        Ok(())
+        server
     }
 }
 
@@ -190,9 +190,9 @@ where
     where
         M: Middleware<State>,
     {
-        log::trace!("Adding middleware {}", middleware.name());
+        log::trace!("正在添加中间件 {}", middleware.name());
         let m = Arc::get_mut(&mut self.middleware)
-            .expect("Registering middleware is not possible after the Server has started");
+            .expect("服务器启动后无法注册中间件");
         m.push(Arc::new(middleware));
         self
     }
