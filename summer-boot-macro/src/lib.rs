@@ -11,7 +11,7 @@
 //!
 //!
 
-use proc_macro::TokenStream;
+use proc_macro::{TokenStream};
 use proc_macro2::{Ident, Span};
 use quote::{quote, ToTokens};
 use serde::Deserialize;
@@ -19,8 +19,9 @@ use std::fs;
 use std::io::Read;
 use syn::{
     parse_file, parse_macro_input, parse_quote, punctuated::Punctuated, Item, ItemFn, Lit, Meta,
-    NestedMeta, Token,
+    NestedMeta, Token, Stmt, Pat, Block,
 };
+use serde_json::{Value};
 
 /// 用于匹配项目根目录下的 `Cargo.toml` 文件。
 /// 匹配规则为：
@@ -78,15 +79,16 @@ pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
     .into()
 }
 
-/// 完成 summer_boot 项目下的自动扫描功能
+/// 完成 summer_boot 项目下的自动扫描功能，会先扫描找到`summer_boot::run();`
+/// 函数，然后在此处进行装配活动。
+///
+/// 注意：如果需要在此处添加运行时，必须在当前宏的后面配置，否则无法完成装配
 /// # Examples
 /// ```rust
 /// #[summer_boot::auto_scan]
+/// // #[summer_boot::main]
 /// fn main() {
-///     println!("stmt 0");
-///     let app = summer_boot::new();
-///                                   // <---- 在这里开始自动注入路由, 印象该注入位置的代码为`input.block.stmts.insert(2, parse_quote! {`
-///     println!("stmt 2");
+///     summer_boot::run();
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -114,19 +116,91 @@ pub fn auto_scan(_: TokenStream, input: TokenStream) -> TokenStream {
     }
 
     let mut input = parse_macro_input!(input as ItemFn);
+    
+    // 查找主函数的位置和是否存在变量名
+    // 未找到则直接退出宏处理
+    // 变量名不存在则默认添加app
+    // 如果存在则会返回出来，供后续使用
+    if let Some((master_index, master_name)) = scan_master_fn(&mut input) {
 
-    // 开始扫描
-    for path in project {
-        scan(&path, &mut input);
+        // 开始扫描
+        for path in project {
+            scan_method(&path, &mut input, (master_index, &master_name));
+        }
+
+        // 解析yaml文件
+        let mut listener_addr = String::from("0.0.0.0:");
+        let config = summer_boot_autoconfigure::load_conf();
+        if let Some(config) = config {
+            let read_server = serde_json::to_string(&config.server).unwrap();
+            let v: Value = serde_json::from_str(&read_server).unwrap();
+            let port = v["port"].to_string();
+            listener_addr.push_str(&port);
+        }
+
+        // 配置listen
+        let listen_token_stream = TokenStream::from(quote!{
+            {
+                #master_name.listen(#listener_addr).await.unwrap();
+            }
+        });
+        let block = parse_macro_input!(listen_token_stream as Block);
+        for stmt in block.stmts {
+            input.block.stmts.push(stmt)
+        }
     }
 
     // 构建新的函数结构，增加函数行
     TokenStream::from(input.into_token_stream())
 }
 
-// 判断是否是目录，如果是路径则需要循环处理，
+// 扫描函数，找到主函数
+// 返回主函数所在的位置索引，并判断是否存在变量名
+// 如果存在，则找到并返回
+// 如果不存在，则删除默认主函数，添加新的主函数
+fn scan_master_fn(input: &mut ItemFn) -> Option<(i32, Ident)> {
+    let mut master_index: i32 = -1;
+    let mut master_name = Ident::new("app", Span::call_site());
+
+    for (index, stmt) in (&mut input.block.stmts).iter_mut().enumerate() {
+        let master = stmt.to_token_stream().to_string();
+        if let Some(_) = master.find("summer_boot :: run()") {
+            master_index = index as i32;
+        }
+    }
+    if master_index < 0 {
+        None
+    } else {
+        if let Stmt::Local(local) = &input.block.stmts[master_index as usize] {
+            // 函数存在变量，需要获取变量名称
+            let pat = &local.pat;
+
+            let x: TokenStream = (quote! {
+                #pat
+            }).into();
+            println!("data:{}", x);
+            if let Pat::Ident(patIdent) = pat {
+                let name = patIdent.ident.to_string();
+                master_name = Ident::new(&name, Span::call_site());
+            }
+        } else {
+            // 函数不存在变量，需要手动添加
+            // TODO 目前相对简单，删除当前函数，并添加指定的函数即可，后续建议修改
+            input.block.stmts.remove(master_index as usize);
+            input.block.stmts.insert(master_index as usize, parse_quote!{
+                let mut app = summer_boot::run();
+            })
+        }
+
+
+        Some((master_index, master_name))
+    }
+}
+
+// 判断是否是目录，如果是路径则需要循环递归处理，
 // 如果是文件则直接处理
-fn scan(path: &str, input: &mut ItemFn) {
+// 处理过程中会将函数调用函数拼接，然后插入到指定的位置 下标+1 的位置
+fn scan_method(path: &str, input: &mut ItemFn, (mut master_index, master_name): (i32, &Ident)) {
     let mut file = fs::File::open(path).unwrap();
     let file_type = file.metadata().unwrap();
     if file_type.is_dir() {
@@ -137,7 +211,7 @@ fn scan(path: &str, input: &mut ItemFn) {
         while let Some(file) = files.next() {
             let file = file.unwrap();
             // TODO 过滤带test文件夹的扫描
-            scan(&file.path().to_str().unwrap(), input);
+            scan_method(&file.path().to_str().unwrap(), input, (master_index, master_name));
         }
     } else {
         // 判断文件名后缀是否是.rs
@@ -176,11 +250,12 @@ fn scan(path: &str, input: &mut ItemFn) {
                                     // 如果注入的方法中没有任何代码，则不操作
                                     break;
                                 } else {
-                                    // 添加
+                                    // 添加，注意下标加 1
+                                    master_index += 1;
                                     input.block.stmts.insert(
-                                        2,
+                                        master_index as usize,
                                         parse_quote! {
-                                            app.at(#url).#method(#fn_path_token_stream);
+                                            #master_name.at(#url).#method(#fn_path_token_stream);
                                         },
                                     );
                                 }
@@ -194,6 +269,8 @@ fn scan(path: &str, input: &mut ItemFn) {
 }
 
 // 配置函数全路径
+// 根据相对项目的绝对路径找到函数调用的全路径链
+// 注意：目前无法完成文件中mod下的函数调用，无法找到
 fn config_function_path(path: &str, fu_name: &str) -> proc_macro2::TokenStream {
     let mut fn_path_idents = Punctuated::<Ident, Token![::]>::new();
     fn_path_idents.push(Ident::new("crate", Span::call_site()));

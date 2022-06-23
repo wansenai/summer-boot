@@ -8,17 +8,10 @@ struct User {
     age: u16,
 }
 
+#[summer_boot::auto_scan]
 #[summer_boot::main]
 async fn main() {
-  let mut Application = summer_boot::run();
-
-  // auto scan 编译前 注入
-  Application.at("/test/api").get(test_api);
-  
-
-  // 这个后面有 run方法自己走  试试放main宏里
-  Application.listen("127.0.0.1:8080").await.unwrap();
-
+    summer_boot::run();
 }
 
 #[summer_boot::post("/test/api")]

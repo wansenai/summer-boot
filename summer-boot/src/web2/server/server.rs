@@ -13,7 +13,7 @@ use gateway::router::{Router, Selection};
 use tcp::{Listener, ToListener};
 use utils::middleware::{Middleware, Next};
 
-use summer_boot_autoconfigure;
+// use summer_boot_autoconfigure;
 
 /// HTTP服务器。
 ///
