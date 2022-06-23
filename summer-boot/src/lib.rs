@@ -26,8 +26,9 @@ pub fn new() -> Server<()> {
 }
 
 /// 自动扫描 日志开启 读取yml
-pub async fn run() -> io::Result<()> {
-    Server::run().await
+#[must_use]
+pub fn run() -> Server<()> {
+    Server::run()
 }
 
 pub fn with_state<State>(state: State) -> Server<State>
