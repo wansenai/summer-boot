@@ -85,9 +85,8 @@ pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
 /// 注意：如果需要在此处添加运行时，必须在当前宏的后面配置，否则无法完成装配
 /// # Examples
 /// ```rust
-/// #[summer_boot::auto_scan]
-/// #[summer_boot::main]
-/// async fn main() {
+/// // #[summer_boot::auto_scan]
+/// fn main() {
 ///     summer_boot::run();
 /// }
 /// ```
