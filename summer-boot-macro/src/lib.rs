@@ -86,8 +86,8 @@ pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
 /// # Examples
 /// ```rust
 /// #[summer_boot::auto_scan]
-/// // #[summer_boot::main]
-/// fn main() {
+/// #[summer_boot::main]
+/// async fn main() {
 ///     summer_boot::run();
 /// }
 /// ```
@@ -139,15 +139,9 @@ pub fn auto_scan(_: TokenStream, input: TokenStream) -> TokenStream {
         }
 
         // 配置listen
-        let listen_token_stream = TokenStream::from(quote!{
-            {
-                #master_name.listen(#listener_addr).await.unwrap();
-            }
+        input.block.stmts.push(parse_quote!{
+            #master_name.listen(#listener_addr).await.unwrap();
         });
-        let block = parse_macro_input!(listen_token_stream as Block);
-        for stmt in block.stmts {
-            input.block.stmts.push(stmt)
-        }
     }
 
     // 构建新的函数结构，增加函数行
