@@ -18,6 +18,4 @@ schemars = "0.8.8"
 tokio = { version = "1.19.2", features = ["full"] }
 
 #summer
-summer-boot-macro = {version = "0.1.0", path = "../summer-boot-macro"}
-summer-boot = {version = "0.1.0", path = "../summer-boot"}
-summer-boot-autoconfigure = { version = "0.1.0", path = "../summer-boot-autoconfigure"}
+summer-boot = "0.1.3"
