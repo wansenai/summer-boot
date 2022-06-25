@@ -48,7 +48,7 @@ fn handle_tcp<State: Clone + Send + Sync + 'static>(app: Server<State>, stream: 
         });
 
         if let Err(error) = fut.await {
-            log::error!("async-h1 error", { error: error.to_string() });
+            log::error!("http1 error", { error: error.to_string() });
         }
     });
 }

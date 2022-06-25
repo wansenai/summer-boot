@@ -34,12 +34,12 @@ src/resources/application.yml
 ```yml
 profiles:
   active: test
+
 ```
 src/resources/application-test.yml
 ```yml
 server:
   port: 8080
-  context_path: /
 ```
 
 src/main.rs

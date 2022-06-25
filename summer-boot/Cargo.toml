@@ -1,13 +1,19 @@
 [package]
 name = "summer-boot"
-version = "0.1.3"
+version = "1.0.0"
 rust-version = "1.60.0"
 edition = "2021"
-description = "summer boot web2"
+description = "summer boot"
 authors = [
-    "James Zow <Jameszow@163.com>"
+    "James Zow <Jameszow@163.com>",
+    "Summeros Team <team@summeros.org>"
 ]
 license = "Apache-2.0"
+readme = "README.md"
+keywords = ["tcp", "http", "web2", "web3", "summer"]
+documentation = "https://github.com/summer-os/summer-boot#readme"
+repository = "https://github.com/summer-os/summer-boot"
+homepage = "https://summeros.io/"
 
 [features]
 default = ["macros"]
@@ -39,7 +45,7 @@ futures-util = "0.3.6"
 
 
 # summer dependencies
-summer-boot-macro = { version = "0.1.2", path = "../summer-boot-macro", optional = true }
+summer-boot-macro = { version = "1.0.0", path = "../summer-boot-macro", optional = true }
 
 #log
 femme = { version = "2.1.1"}

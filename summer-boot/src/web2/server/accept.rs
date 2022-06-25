@@ -53,39 +53,3 @@ where
 
     PollFn(func)
 }
-
-/// Adapt a `Stream` of incoming connections into an `Accept`.
-/// 将传入连接的 `Stream` 改为 `Accept`。
-///
-/// # Optional
-///
-/// 此功能需要在
-/// `Cargo.toml` feature进行配置。
-#[cfg(feature = "stream")]
-pub fn from_stream<S, IO, E>(stream: S) -> impl Accept<Conn = IO, Error = E>
-where
-    S: Stream<Item = Result<IO, E>>,
-{
-    pin_project! {
-        struct FromStream<S> {
-            #[pin]
-            stream: S,
-        }
-    }
-
-    impl<S, IO, E> Accept for FromStream<S>
-    where
-        S: Stream<Item = Result<IO, E>>,
-    {
-        type Conn = IO;
-        type Error = E;
-        fn poll_accept(
-            self: Pin<&mut Self>,
-            cx: &mut task::Context<'_>,
-        ) -> Poll<Option<Result<Self::Conn, Self::Error>>> {
-            self.project().stream.poll_next(cx)
-        }
-    }
-
-    FromStream { stream }
-}

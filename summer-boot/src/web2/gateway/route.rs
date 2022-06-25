@@ -1,4 +1,4 @@
-use crate::aop;
+use crate::server;
 use crate::context;
 use crate::gateway;
 use crate::log;
@@ -9,7 +9,7 @@ use std::io;
 use std::path::Path;
 use std::sync::Arc;
 
-use aop::endpoint::{Endpoint, MiddlewareEndpoint};
+use server::endpoint::{Endpoint, MiddlewareEndpoint};
 use context::serve_dir::ServeDir;
 use context::serve_file::ServeFile;
 use utils::middleware::Middleware;

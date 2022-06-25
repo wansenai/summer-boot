@@ -3,11 +3,11 @@ use crate::gateway;
 use crate::log;
 use crate::tcp;
 use crate::utils;
-use crate::{Endpoint, Request, Route};
+use crate::{Request, Route};
+use super::endpoint::Endpoint;
 
 use async_std::io;
 use async_std::sync::Arc;
-use serde_json::Value;
 
 use gateway::router::{Router, Selection};
 use tcp::{Listener, ToListener};
@@ -66,6 +66,7 @@ impl Server<()> {
     /// 默认开启日志记录
     /// 读取yml然后绑定监听
     ///
+    /// 目前把他移动到macro扫描里面去了
     pub fn run() -> Self {
         log::start();
         let server = Self::with_state(());

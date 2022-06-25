@@ -1,13 +1,21 @@
 [package]
 name = "summer-boot-autoconfigure"
-version = "0.1.2"
+version = "1.0.0"
 rust-version = "1.60.0"
 edition = "2021"
 description = "summer boot autoconfigure"
 authors = [
-    "James Zow <Jameszow@163.com>"
+    "James Zow <Jameszow@163.com>",
+    "Xinyu Gao",
+    "Summeros Team <team@summeros.org>"
 ]
 license = "Apache-2.0"
+readme = "README.md"
+keywords = ["middleware", "autoconfigure", "summer"]
+documentation = "https://github.com/summer-os/summer-boot/summer-boot-autoconfigure/#readme"
+repository = "https://github.com/summer-os/summer-boot"
+homepage = "https://summeros.io/"
+
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
