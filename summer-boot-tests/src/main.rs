@@ -1,5 +1,4 @@
 use serde::Deserialize;
-use serde_json::Value;
 use summer_boot::{Request, Result};
 
 #[derive(Debug, Deserialize)]

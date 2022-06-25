@@ -9,8 +9,8 @@ use std::{
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GlobalConfig {
-    pub mysql: Mysql,
-    pub server: Server,
+    pub mysql: Option<Mysql>,
+    pub server: Option<Server>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -60,6 +60,28 @@ struct Name {
 }
 
 ///
+/// 判断是workspace还是project
+/// 
+fn check_project_workspace() -> String {
+    let mut types: String = String::new();
+
+    // 找到需要扫描的路径
+    let mut cargo_toml = fs::File::open("Cargo.toml").unwrap();
+    let mut content = String::new();
+    cargo_toml.read_to_string(&mut content).unwrap();
+
+    // 根据包类型分别处理
+    if let Ok(conf_work_space) = toml::from_str::<ConfWorkSpace>(&content) {
+        if let Some(workspace) = conf_work_space.workspace {
+            types.push_str("workspace");
+        } else {
+            types.push_str("project");
+        }
+    }
+    types
+}
+
+///
 /// 获取toml package_name
 ///
 fn get_package_name() -> String {
@@ -96,9 +118,15 @@ fn get_package_name() -> String {
 /// 加载环境配置
 ///
 pub fn load_env_conf() -> Option<EnvConfig> {
-    let package_name = get_package_name();
-
-    let path = format!("{}/src/resources/application.yml", package_name);
+    let mut path = String::new();
+    let types =  check_project_workspace();
+    
+    if types.eq("workspace") {
+        let package_name = get_package_name();
+        path = format!("{}/src/resources/application.yml", package_name);
+    } else if types.eq("project") {
+        path = format!("src/resources/application.yml");
+    }
 
     println!("{}", path);
 
@@ -129,9 +157,17 @@ pub fn load_env_conf() -> Option<EnvConfig> {
 /// action  dev 开始环境 test 测试环境 prod 生产环境
 ///
 pub fn load_global_config(action: String) -> Option<GlobalConfig> {
-    let package_name = get_package_name();
 
-    let path = format!("{}/src/resources/application-{}.yml", package_name, &action);
+    let mut path = String::new();
+    let types =  check_project_workspace();
+    
+    if types.eq("workspace") {
+        let package_name = get_package_name();
+        path = format!("{}/src/resources/application-{}.yml", package_name, &action);
+    } else if types.eq("project") {
+        path = format!("src/resources/application-{}.yml", &action);
+    }
+    
     let schema = yaml_from_str::<RootSchema>(&read_to_string(&path).unwrap_or_else(|_| {
         panic!(
             "Error loading configuration file {}, please check the configuration!",

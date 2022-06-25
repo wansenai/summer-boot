@@ -1,6 +1,6 @@
 [package]
 name = "summer-boot"
-version = "0.1.0"
+version = "0.1.3"
 rust-version = "1.60.0"
 edition = "2021"
 description = "summer boot web2"
@@ -39,8 +39,7 @@ futures-util = "0.3.6"
 
 
 # summer dependencies
-summer-boot-actuator = { version = "0.1.0", path = "../summer-boot-actuator"}
-summer-boot-macro = { version = "0.1.0", path = "../summer-boot-macro", optional = true }
+summer-boot-macro = { version = "0.1.2", path = "../summer-boot-macro", optional = true }
 
 #log
 femme = { version = "2.1.1"}
