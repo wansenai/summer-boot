@@ -1,0 +1,1 @@
+# Summer Boot AutoConfigure

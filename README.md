@@ -23,6 +23,27 @@ summer_boot::web2::server::server Server listening on http://127.0.0.1:8080
 
 ## Quick Start
 
+Cargo.toml:
+```rust
+summer-boot = "0.1.3"
+```
+
+Add resuorce configuration file to src directory
+
+src/resources/application.yml
+```yml
+profiles:
+  active: test
+
+```
+src/resources/application-test.yml
+```yml
+server:
+  port: 7798
+  context_path: /
+```
+
+src/main.rs
 ```rust
 use serde::Deserialize;
 use summer_boot::{Request, Result};
@@ -37,9 +58,7 @@ struct User {
 #[summer_boot::auto_scan]
 #[summer_boot::main]
 async fn main() {
-    log::start();
-    let mut application = summer_boot::new();
-    application.listen("127.0.0.1:8080").await.unwrap();
+    summer_boot::run();
 }
 
 #[summer_boot::post("/test/api")]
