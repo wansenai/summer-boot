@@ -6,7 +6,7 @@ edition = "2021"
 description = "summer boot autoconfigure"
 authors = [
     "James Zow <Jameszow@163.com>",
-    "Xinyu Gao",
+    "Xinyu Gao <barrybivinsxinyu@gmail.com>",
     "Summeros Team <team@summeros.org>"
 ]
 license = "Apache-2.0"
