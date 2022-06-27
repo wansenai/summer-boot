@@ -19,7 +19,7 @@ use std::fs;
 use std::io::Read;
 use syn::{
     parse_file, parse_macro_input, parse_quote, punctuated::Punctuated, Item, ItemFn, Lit, Meta,
-    NestedMeta, Token, Stmt, Pat, Block,
+    NestedMeta, Token, Stmt, Pat, AttributeArgs
 };
 use serde_json::{Value};
 
@@ -80,19 +80,22 @@ pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 /// 完成 summer_boot 项目下的自动扫描功能，会先扫描找到`summer_boot::run();`
-/// 函数，然后在此处进行装配活动。
+/// 函数，然后在此处进行装配活动。也可以手动增加过滤路径或过滤文件。
+/// 如果增加过滤路径，需要在末尾添加 `/`，如果增加过滤文件，需要在末尾添加 `.rs`。
 ///
 /// 注意：如果需要在此处添加运行时，必须在当前宏的后面配置，否则无法完成装配
 /// # Examples
 /// ```rust
 /// // #[summer_boot::auto_scan]
+/// // #[summer_boot::auto_scan("summer-boot-tests/src/lib.rs")]
 /// fn main() {
 ///     summer_boot::run();
 /// }
 /// ```
 #[proc_macro_attribute]
-pub fn auto_scan(_: TokenStream, input: TokenStream) -> TokenStream {
+pub fn auto_scan(args: TokenStream, input: TokenStream) -> TokenStream {
     let mut project = Vec::<String>::new();
+    let mut filter_paths = Vec::<String>::new();
 
     // 找到需要扫描的路径
     let mut cargo_toml = fs::File::open("Cargo.toml").unwrap();
@@ -114,6 +117,15 @@ pub fn auto_scan(_: TokenStream, input: TokenStream) -> TokenStream {
         }
     }
 
+    // 解析宏信息
+    let args = parse_macro_input!(args as AttributeArgs);
+    for arg in args {
+            if let NestedMeta::Lit(Lit::Str(path)) = arg {
+                filter_paths.push(path.value());
+            }
+    }
+
+    // 解析函数体
     let mut input = parse_macro_input!(input as ItemFn);
     
     // 查找主函数的位置和是否存在变量名
@@ -124,7 +136,7 @@ pub fn auto_scan(_: TokenStream, input: TokenStream) -> TokenStream {
 
         // 开始扫描
         for path in project {
-            scan_method(&path, &mut input, (master_index, &master_name));
+            scan_method(&path, &filter_paths, &mut input, (master_index, &master_name));
         }
 
         // 解析yaml文件
@@ -168,12 +180,8 @@ fn scan_master_fn(input: &mut ItemFn) -> Option<(i32, Ident)> {
             // 函数存在变量，需要获取变量名称
             let pat = &local.pat;
 
-            let x: TokenStream = (quote! {
-                #pat
-            }).into();
-            println!("data:{}", x);
-            if let Pat::Ident(patIdent) = pat {
-                let name = patIdent.ident.to_string();
+            if let Pat::Ident(pat_ident) = pat {
+                let name = pat_ident.ident.to_string();
                 master_name = Ident::new(&name, Span::call_site());
             }
         } else {
@@ -193,7 +201,7 @@ fn scan_master_fn(input: &mut ItemFn) -> Option<(i32, Ident)> {
 // 判断是否是目录，如果是路径则需要循环递归处理，
 // 如果是文件则直接处理
 // 处理过程中会将函数调用函数拼接，然后插入到指定的位置 下标+1 的位置
-fn scan_method(path: &str, input: &mut ItemFn, (mut master_index, master_name): (i32, &Ident)) {
+fn scan_method(path: &str, filter_paths: &Vec<String>, input_token_stream: &mut ItemFn, (mut master_index, master_name): (i32, &Ident)) {
     let mut file = fs::File::open(path).unwrap();
     let file_type = file.metadata().unwrap();
     if file_type.is_dir() {
@@ -203,12 +211,16 @@ fn scan_method(path: &str, input: &mut ItemFn, (mut master_index, master_name): 
         // 循环里面的所有文件
         while let Some(file) = files.next() {
             let file = file.unwrap();
-            // TODO 过滤带test文件夹的扫描
-            scan_method(&file.path().to_str().unwrap(), input, (master_index, master_name));
+            scan_method(&file.path().to_str().unwrap(), filter_paths, input_token_stream, (master_index, master_name));
         }
     } else {
         // 判断文件名后缀是否是.rs
         if path.ends_with(".rs") {
+            // 判断是否需要过滤
+            if filter_paths.iter().any(|p| {
+                path.contains(p)
+            }) { return; }
+
             // 如果是文件，则处理内部细节
             let mut content = String::new();
             file.read_to_string(&mut content).unwrap();
@@ -239,13 +251,13 @@ fn scan_method(path: &str, input: &mut ItemFn, (mut master_index, master_name): 
                             let attr_url = meta.nested.into_iter().next().unwrap();
                             if let NestedMeta::Lit(Lit::Str(url)) = attr_url {
                                 let url = url.value();
-                                if input.block.stmts.len() < 1 {
+                                if input_token_stream.block.stmts.len() < 1 {
                                     // 如果注入的方法中没有任何代码，则不操作
                                     break;
                                 } else {
                                     // 添加，注意下标加 1
                                     master_index += 1;
-                                    input.block.stmts.insert(
+                                    input_token_stream.block.stmts.insert(
                                         master_index as usize,
                                         parse_quote! {
                                             #master_name.at(#url).#method(#fn_path_token_stream);
@@ -384,7 +396,7 @@ async fn example(mut req: Request<()>) -> Result {
 ```
 "#);
             #[proc_macro_attribute]
-            pub fn $method(args: TokenStream, input: TokenStream) -> TokenStream {
+            pub fn $method(_args: TokenStream, input: TokenStream) -> TokenStream {
 
                 let mut input = parse_macro_input!(input as ItemFn);
                 let attrs = &input.attrs;
