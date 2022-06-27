@@ -1,7 +1,7 @@
 <h1 align="center">Summer Boot</h1>
 <div align="center">
  <strong>
-   Serve the web2 and web3
+   web2 and web3 Server
  </strong>
 </div>
 
