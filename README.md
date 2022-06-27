@@ -1,7 +1,37 @@
-# Summer Boot
+<h1 align="center">Summer Boot</h1>
+<div align="center">
+ <strong>
+   Serve the web2 and web3
+ </strong>
+</div>
 
-<a href="https://app.bors.tech/repositories/45710"><img src="https://bors.tech/images/badge_small.svg" alt="Bors enabled"></a>
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot?ref=badge_shield)
+<br />
+
+<div align="center">
+  <!-- Crates version -->
+  <a href="https://crates.io/crates/tide">
+    <img src="https://img.shields.io/crates/v/summer-boot.svg?style=flat-square"
+    alt="Crates.io version" />
+  </a>
+  <!-- Downloads -->
+  <a href="https://crates.io/crates/tide">
+    <img src="https://img.shields.io/crates/d/summer-boot.svg?style=flat-square"
+      alt="Download" />
+  </a>
+  <!-- bors -->
+  <a href="https://app.bors.tech/repositories/45710">
+    <img src="https://bors.tech/images/badge_small.svg"
+      alt="ors enabled" />
+  </a>
+  <!-- fossa status -->
+  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot?ref=badge_shield">
+    <img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot.svg?type=shield"
+      alt="ors enabled" />
+  </a>
+</div>
+
+<br />
+
 
 The next generation decentralized web framework allows users to manage and share their own data. 
 It will be a wide area and cross regional web framework.
