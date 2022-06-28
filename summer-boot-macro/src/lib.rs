@@ -15,7 +15,7 @@ use proc_macro::{TokenStream};
 use proc_macro2::{Ident, Span};
 use quote::{quote, ToTokens};
 use serde::Deserialize;
-use std::fs;
+use std::{fs, fmt::format};
 use std::io::Read;
 use syn::{
     parse_file, parse_macro_input, parse_quote, punctuated::Punctuated, Item, ItemFn, Lit, Meta,
@@ -134,19 +134,22 @@ pub fn auto_scan(args: TokenStream, input: TokenStream) -> TokenStream {
     // 如果存在则会返回出来，供后续使用
     if let Some((master_index, master_name)) = scan_master_fn(&mut input) {
 
-        // 开始扫描
-        for path in project {
-            scan_method(&path, &filter_paths, &mut input, (master_index, &master_name));
-        }
-
         // 解析yaml文件
         let mut listener_addr = String::from("0.0.0.0:");
+        let mut app_context_path = String::from("");
         let config = summer_boot_autoconfigure::load_conf();
         if let Some(config) = config {
             let read_server = serde_json::to_string(&config.server).unwrap();
             let v: Value = serde_json::from_str(&read_server).unwrap();
             let port = v["port"].to_string();
+            let context_path = v["context_path"].to_string();
             listener_addr.push_str(&port);
+            app_context_path.push_str(&context_path);
+        }
+
+        // 开始扫描
+        for path in project {
+            scan_method(&path, &filter_paths, &mut input, &app_context_path, (master_index, &master_name));
         }
 
         // 配置listen
@@ -201,7 +204,7 @@ fn scan_master_fn(input: &mut ItemFn) -> Option<(i32, Ident)> {
 // 判断是否是目录，如果是路径则需要循环递归处理，
 // 如果是文件则直接处理
 // 处理过程中会将函数调用函数拼接，然后插入到指定的位置 下标+1 的位置
-fn scan_method(path: &str, filter_paths: &Vec<String>, input_token_stream: &mut ItemFn, (mut master_index, master_name): (i32, &Ident)) {
+fn scan_method(path: &str, filter_paths: &Vec<String>, input_token_stream: &mut ItemFn, context_path: &str, (mut master_index, master_name): (i32, &Ident)) {
     let mut file = fs::File::open(path).unwrap();
     let file_type = file.metadata().unwrap();
     if file_type.is_dir() {
@@ -211,7 +214,7 @@ fn scan_method(path: &str, filter_paths: &Vec<String>, input_token_stream: &mut 
         // 循环里面的所有文件
         while let Some(file) = files.next() {
             let file = file.unwrap();
-            scan_method(&file.path().to_str().unwrap(), filter_paths, input_token_stream, (master_index, master_name));
+            scan_method(&file.path().to_str().unwrap(), filter_paths, input_token_stream, context_path, (master_index, master_name));
         }
     } else {
         // 判断文件名后缀是否是.rs
@@ -251,6 +254,8 @@ fn scan_method(path: &str, filter_paths: &Vec<String>, input_token_stream: &mut 
                             let attr_url = meta.nested.into_iter().next().unwrap();
                             if let NestedMeta::Lit(Lit::Str(url)) = attr_url {
                                 let url = url.value();
+                                let url = format!("{}{}", context_path, url).replace("\"", "").replace("//", "/");
+
                                 if input_token_stream.block.stmts.len() < 1 {
                                     // 如果注入的方法中没有任何代码，则不操作
                                     break;

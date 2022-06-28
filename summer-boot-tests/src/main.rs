@@ -7,7 +7,7 @@ struct User {
     age: u16,
 }
 
-#[summer_boot::auto_scan("summer-boot-tests/")]
+#[summer_boot::auto_scan]
 #[summer_boot::main]
 async fn main() {
     summer_boot::run();
