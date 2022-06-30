@@ -9,12 +9,12 @@
 
 <div align="center">
   <!-- Crates version -->
-  <a href="https://crates.io/crates/tide">
+  <a href="https://crates.io/crates/summer-boot">
     <img src="https://img.shields.io/crates/v/summer-boot.svg?style=flat-square"
     alt="Crates.io version" />
   </a>
   <!-- Downloads -->
-  <a href="https://crates.io/crates/tide">
+  <a href="https://crates.io/crates/summer-boot">
     <img src="https://img.shields.io/crates/d/summer-boot.svg?style=flat-square"
       alt="Download" />
   </a>
