@@ -15,31 +15,32 @@ documentation = "https://github.com/summer-os/summer-boot#readme"
 repository = "https://github.com/summer-os/summer-boot"
 homepage = "https://summeros.io/"
 
-[features]
-default = ["macros"]
-
-macros = [
-    "summer-boot-macro"
-]
-
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["full"]}
 routefinder = "0.5.0"
 
-#async
-async-std = { version = "1.8.0", features = ["attributes"] }
-async-trait = "0.1.41"
-async-channel = "1.5.1"
-async-dup = "1.2.2"
+#hyper dependencies
+bytes = "1.1.0"
+futures-core = { version = "0.3", default-features = false }
+futures-channel = "0.3"
+http = "0.2"
+http-body = "0.4.5"
+httpdate = "1.0"
+h2 = { version = "0.3.9", optional = true }
+itoa = "1"
+tracing = { version = "0.1", default-features = false, features = ["std"] }
+tower-service = "0.3"
+want = "0.3"
+
+# Optional
+libc = { version = "0.2", optional = true }
+socket2 = { version = "0.4", optional = true }
 
 #pin
-pin-project = "1.0.2"
 pin-project-lite = "0.2.4"
 
-# http middleware
-http-types = { version = "2.11.0", default-features = false, features = ["fs"] }
 httparse = "1.6"
 futures-util = "0.3.6"
 
@@ -51,3 +52,71 @@ summer-boot-macro = { version = "1.0.0", path = "../summer-boot-macro", optional
 femme = { version = "2.1.1"}
 kv-log-macro = "1.0.7"
 log = { version = "0.4.13", features = ["kv_unstable_std"] }
+
+
+[dev-dependencies]
+futures-util = { version = "0.3", default-features = false, features = ["alloc"] }
+matches = "0.1"
+num_cpus = "1.0"
+pretty_env_logger = "0.4"
+spmc = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = [
+    "fs",
+    "macros",
+    "io-std",
+    "io-util",
+    "rt",
+    "rt-multi-thread", # so examples can use #[tokio::main]
+    "sync",
+    "time",
+    "test-util",
+] }
+tokio-test = "0.4"
+tokio-util = { version = "0.7", features = ["codec"] }
+tower = { version = "0.4", features = ["make", "util"] }
+url = "2.2"
+
+[target.'cfg(any(target_os = "linux", target_os = "macos"))'.dev-dependencies]
+pnet_datalink = "0.31.0"
+
+
+[features]
+default = []
+
+macros = [
+    "summer-boot-macro"
+]
+
+full = [
+    "client",
+    "http1",
+    "http2",
+    "server",
+    "runtime",
+    "summer-boot-macro",
+]
+
+# HTTP versions
+http1 = []
+http2 = ["h2"]
+
+# Client/Server
+client = []
+server = []
+
+# Tokio support
+runtime = [
+    "tcp",
+    "tokio/rt",
+    "tokio/time",
+]
+tcp = [
+    "socket2",
+    "tokio/net",
+    "tokio/rt",
+    "tokio/time",
+]
+nightly = []
+__internal_happy_eyeballs_tests = []
