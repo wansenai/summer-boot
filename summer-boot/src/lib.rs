@@ -1,7 +1,7 @@
 pub mod common;
 pub mod log;
 
-mod utils;
+pub mod utils;
 mod http1;
 mod server;
 mod gateway;
