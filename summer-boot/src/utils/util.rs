@@ -11,7 +11,7 @@ use std::future::Future;
 /// # Examples
 ///
 /// ```rust
-/// use summer_boot::web2::utils::util;
+/// use summer_boot::utils::util;
 /// use summer_boot::Request;
 /// use std::time::Instant;
 ///

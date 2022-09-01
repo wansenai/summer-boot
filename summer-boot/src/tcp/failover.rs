@@ -1,11 +1,11 @@
-use crate::web2::tcp::{Listener, ToListener};
+use crate::tcp::{Listener, ToListener};
 use crate::Server;
 
 use std::fmt::{self, Debug, Display, Formatter};
 
 use async_std::io;
 
-use crate::web2::tcp::ListenInfo;
+use crate::tcp::ListenInfo;
 
 #[derive(Default)]
 pub struct FailoverListener<State> {

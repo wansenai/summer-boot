@@ -1,4 +1,4 @@
-use crate::web2::tcp::{ListenInfo, Listener, ToListener};
+use crate::tcp::{ListenInfo, Listener, ToListener};
 use crate::Server;
 
 use std::fmt::{self, Debug, Display, Formatter};

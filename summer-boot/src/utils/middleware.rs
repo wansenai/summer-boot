@@ -1,4 +1,4 @@
-use crate::web2::server;
+use crate::server;
 use crate::{Request, Response};
 
 use server::endpoint::DynEndpoint;
