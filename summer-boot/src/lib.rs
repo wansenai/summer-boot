@@ -1,8 +1,12 @@
 pub mod common;
 pub mod log;
-pub mod web2;
 
-use web2::{aop, context, gateway, http1, tcp, utils, server};
+mod utils;
+mod http1;
+mod server;
+mod gateway;
+mod tcp;
+mod context;
 
 pub use http1::http;
 pub use utils::middleware::{Middleware, Next};
@@ -15,7 +19,7 @@ pub use server::endpoint::Endpoint;
 pub use gateway::route::Route;
 pub use http_types::{self, Body, Error, Status, StatusCode};
 
-use web2::server::server::Server;
+use server::server::Server;
 
 #[must_use]
 pub fn new() -> Server<()> {
