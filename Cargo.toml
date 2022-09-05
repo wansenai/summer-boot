@@ -4,7 +4,6 @@ members = [
   # other members
   "summer-boot-actuator",
   "summer-boot-autoconfigure",
-  "summer-boot-tests",
   "summer-boot-macro",
-  "summer-boot-tools",
+  "example",
 ]

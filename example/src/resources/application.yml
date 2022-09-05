@@ -1,0 +1,3 @@
+#切换配置文件
+profiles:
+  active: test

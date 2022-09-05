@@ -1,0 +1,21 @@
+[package]
+name = "example"
+version = "0.1.0"
+rust-version = "1.60.0"
+edition = "2021"
+description = "summer boot example"
+authors = [
+    "James Zow <Jameszow@163.com>"
+]
+license = "Apache-2.0"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+serde_json = "1.0.75"
+lazy_static = "1.4.0"
+schemars = "0.8.8"
+tokio = { version = "1.19.2", features = ["full"] }
+
+#summer
+summer-boot = { version = "1.0.0", path = "../summer-boot" }
