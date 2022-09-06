@@ -33,8 +33,8 @@
 <br />
 
 
-The next generation decentralized web framework allows users to manage and share their own data. 
-It will be a wide area and cross regional web framework.
+Encapsulating tide, combined with the design principles of spring boot.
+will simplify web development and enable developers to focus more on business API development.
 
 ```rust
 summer_boot::log Logger started
