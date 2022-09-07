@@ -1,7 +1,7 @@
 <h1 align="center">Summer Boot</h1>
 <div align="center">
  <strong>
-   web Server
+  A web framework for Rust
  </strong>
 </div>
 
