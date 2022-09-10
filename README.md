@@ -48,7 +48,7 @@ summer_boot::log
                                                                       
   :: Summer Boot Version::             (1.0.0)                                                                    
  
-summer_boot::web2::server::server Server listening on http://127.0.0.1:8080
+summer_boot::server::server Server listening on http://127.0.0.1:8080
 ```
 
 ## Quick Start
