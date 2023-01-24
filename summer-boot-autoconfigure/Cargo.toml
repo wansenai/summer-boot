@@ -24,4 +24,4 @@ serde_json = "1.0.75"
 schemars = "0.8.8"
 
 #file
-toml = "0.5"
+toml = "0.6"
