@@ -32,7 +32,11 @@
 
 <br />
 
+Due to various reasons, we will no longer maintain it. 
 
+If you have any ideas, feel free to contact us at any time Jameszow@wansen.email
+
+------
 Encapsulating tide, combined with the design principles of spring boot.
 will simplify web development and enable developers to focus more on business API development.
 
