@@ -5,5 +5,5 @@ members = [
   "summer-boot-actuator",
   "summer-boot-autoconfigure",
   "summer-boot-macro",
-  "example",
+  "example"
 ]
