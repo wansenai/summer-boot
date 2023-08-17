@@ -28,4 +28,4 @@ serde_json = "1"
 summer-boot-autoconfigure = { version = "1.0.0", path = "../summer-boot-autoconfigure" }
 
 [dev-dependencies]
-summer-boot = { version = "1.0.0", path = "../summer-boot" }
+summer-boot = { version = "1.0.1", path = "../summer-boot" }
