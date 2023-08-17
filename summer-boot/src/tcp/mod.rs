@@ -7,6 +7,7 @@ mod parsed;
 mod tcp_listener;
 mod to_listener;
 mod to_listener_impls;
+#[cfg(all(unix, feature = "h1-server"))]
 mod unix;
 
 use std::fmt::{Debug, Display};
@@ -20,6 +21,7 @@ pub use to_listener::ToListener;
 
 pub(crate) use parsed::ParsedListener;
 pub(crate) use tcp_listener::TcpListener;
+#[cfg(all(unix, feature = "h1-server"))]
 pub(crate) use unix::UnixListener;
 
 #[macro_export]

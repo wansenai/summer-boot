@@ -1,3 +1,4 @@
+#[cfg(unix)]
 use super::UnixListener;
 use super::{ConcurrentListener, FailoverListener, ParsedListener, TcpListener, ToListener};
 use async_std::io;

@@ -1,6 +1,6 @@
 [package]
 name = "summer-boot"
-version = "1.0.0"
+version = "1.0.1"
 rust-version = "1.60.0"
 edition = "2021"
 description = "summer boot"
@@ -17,10 +17,10 @@ homepage = "https://summeros.io/"
 
 [features]
 default = ["macros"]
-
 macros = [
     "summer-boot-macro"
 ]
+unstable = []
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
@@ -39,7 +39,7 @@ pin-project = "1.0.2"
 pin-project-lite = "0.2.4"
 
 # http middleware
-http-types = { version = "2.11.0", default-features = false, features = ["fs"] }
+http-types = { version = "2.11.0"}
 httparse = "1.6"
 futures-util = "0.3.6"
 
@@ -51,3 +51,7 @@ summer-boot-macro = { version = "1.0.0", path = "../summer-boot-macro", optional
 femme = { version = "2.1.1"}
 kv-log-macro = "1.0.7"
 log = { version = "0.4.13", features = ["kv_unstable_std"] }
+
+
+[dev-dependencies]
+async-std = { version = "1.6.5", feature = ["unstable", "attributes"]}

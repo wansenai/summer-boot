@@ -1,7 +1,7 @@
 use super::{is_transient_error, ListenInfo};
 
 use super::Listener;
-use crate::{http, log, Server};
+use crate::Server;
 
 use std::fmt::{self, Display, Formatter};
 
@@ -9,6 +9,8 @@ use async_std::os::unix::net::{self, SocketAddr, UnixStream};
 use async_std::path::PathBuf;
 use async_std::prelude::*;
 use async_std::{io, task};
+use kv_log_macro::error;
+
 
 pub struct UnixListener<State> {
     path: Option<PathBuf>,
@@ -42,14 +44,14 @@ fn handle_unix<State: Clone + Send + Sync + 'static>(app: Server<State>, stream:
         let local_addr = unix_socket_addr_to_string(stream.local_addr());
         let peer_addr = unix_socket_addr_to_string(stream.peer_addr());
 
-        let fut = http::accept(stream, |mut req| async {
+        let fut = async_h1::accept(stream, |mut req| async {
             req.set_local_addr(local_addr.as_ref());
             req.set_peer_addr(peer_addr.as_ref());
             app.respond(req).await
         });
 
         if let Err(error) = fut.await {
-            log::error!("async-h1 error", { error: error.to_string() });
+            error!("async-h1 error", { error: error.to_string() });
         }
     });
 }
@@ -60,11 +62,11 @@ where
     State: Clone + Send + Sync + 'static,
 {
     async fn bind(&mut self, server: Server<State>) -> io::Result<()> {
-        assert!(self.server.is_none(), "`bind` 只能调用一次");
+        assert!(self.server.is_none(), "`bind` should only be called once");
         self.server = Some(server);
 
         if self.listener.is_none() {
-            let path = self.path.take().expect("`bind` 只能调用一次");
+            let path = self.path.take().expect("`bind` should only be called once");
             let listener = net::UnixListener::bind(path).await?;
             self.listener = Some(listener);
         }
@@ -82,11 +84,11 @@ where
         let server = self
             .server
             .take()
-            .expect("`Listener::bind` 必须在之前调用 `Listener::accept`");
+            .expect("`Listener::bind` must be called before `Listener::accept`");
         let listener = self
             .listener
             .take()
-            .expect("`Listener::bind` 必须在之前调用 `Listener::accept`");
+            .expect("`Listener::bind` must be called before `Listener::accept`");
 
         let mut incoming = listener.incoming();
 
@@ -95,7 +97,7 @@ where
                 Err(ref e) if is_transient_error(e) => continue,
                 Err(error) => {
                     let delay = std::time::Duration::from_millis(500);
-                    crate::log::error!("Error: {}. for {:?}.", error, delay);
+                    error!("Error: {}. Pausing for {:?}.", error, delay);
                     task::sleep(delay).await;
                     continue;
                 }
@@ -137,16 +139,16 @@ impl<State> Display for UnixListener<State> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self.listener {
             Some(listener) => {
-                let path = listener.local_addr().expect("无法获取本地路径目录");
+                let path = listener.local_addr().expect("Could not get local path dir");
                 let pathname = path
                     .as_pathname()
                     .and_then(|p| p.canonicalize().ok())
-                    .expect("无法格式化路径目录");
+                    .expect("Could not canonicalize path dir");
                 write!(f, "http+unix://{}", pathname.display())
             }
             None => match &self.path {
                 Some(path) => write!(f, "http+unix://{}", path.display()),
-                None => write!(f, "没有监听，请检查是否成功调用了 `Listener::bind`?"),
+                None => write!(f, "Not listening. Did you forget to call `Listener::bind`?"),
             },
         }
     }
