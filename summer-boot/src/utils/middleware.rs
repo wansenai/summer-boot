@@ -1,8 +1,8 @@
 use crate::server;
 use crate::{Request, Response};
 
-use server::endpoint::DynEndpoint;
 use async_trait::async_trait;
+use server::endpoint::DynEndpoint;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;

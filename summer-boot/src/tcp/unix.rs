@@ -11,7 +11,6 @@ use async_std::prelude::*;
 use async_std::{io, task};
 use kv_log_macro::error;
 
-
 pub struct UnixListener<State> {
     path: Option<PathBuf>,
     listener: Option<net::UnixListener>,

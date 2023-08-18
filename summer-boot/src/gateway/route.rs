@@ -1,7 +1,7 @@
-use crate::server;
 use crate::context;
 use crate::gateway;
 use crate::log;
+use crate::server;
 use crate::utils;
 
 use std::fmt::Debug;
@@ -9,9 +9,9 @@ use std::io;
 use std::path::Path;
 use std::sync::Arc;
 
-use server::endpoint::{Endpoint, MiddlewareEndpoint};
 use context::serve_dir::ServeDir;
 use context::serve_file::ServeFile;
+use server::endpoint::{Endpoint, MiddlewareEndpoint};
 use utils::middleware::Middleware;
 
 use gateway::router::Router;

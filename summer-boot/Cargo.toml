@@ -45,7 +45,7 @@ futures-util = "0.3.6"
 
 
 # summer dependencies
-summer-boot-macro = { version = "1.0.0", path = "../summer-boot-macro", optional = true }
+summer-boot-macro = { version = "1.0.0" , optional = true, path = "../summer-boot-macro"}
 
 #log
 femme = { version = "2.1.1"}
