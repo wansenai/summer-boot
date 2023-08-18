@@ -2,9 +2,11 @@ use schemars::schema::RootSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str as json_from_str, to_string_pretty};
 use serde_yaml::from_str as yaml_from_str;
+use std::path::Path;
 use std::{
     fs::{self, read_to_string},
     io::Read,
+    ops::Add,
 };
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -61,14 +63,14 @@ struct Name {
 
 ///
 /// 判断是workspace还是project
-/// 
+///
 fn check_project_workspace() -> String {
     let mut types: String = String::new();
 
     // 找到需要扫描的路径
-    let mut cargo_toml = fs::File::open("Cargo.toml").unwrap();
+    let mut cargo_toml = fs::File::open("Cargo.toml").expect("2222");
     let mut content = String::new();
-    cargo_toml.read_to_string(&mut content).unwrap();
+    cargo_toml.read_to_string(&mut content).expect("3333");
 
     // 根据包类型分别处理
     if let Ok(conf_work_space) = toml::from_str::<ConfWorkSpace>(&content) {
@@ -85,9 +87,9 @@ fn check_project_workspace() -> String {
 /// 获取toml package_name
 ///
 fn get_package_name() -> String {
-    let mut cargo_toml = fs::File::open("Cargo.toml").unwrap();
+    let mut cargo_toml = fs::File::open("Cargo.toml").expect("4444");
     let mut content = String::new();
-    cargo_toml.read_to_string(&mut content).unwrap();
+    cargo_toml.read_to_string(&mut content).expect("5555");
 
     let mut projects = Vec::<String>::new();
 
@@ -95,9 +97,9 @@ fn get_package_name() -> String {
         if let Some(workspace) = conf_work_space.workspace {
             if let Some(members) = workspace.members {
                 for member in members {
-                    projects.push(format!("{}/src/resources", member));
+                    projects.push(format!("{}/src/resources/application.yml", member));
                     for project in &projects {
-                        let check = fs::File::open(project).is_ok();
+                        let check = fs::metadata(project).is_ok();
                         if check == true {
                             return member;
                         }
@@ -110,7 +112,7 @@ fn get_package_name() -> String {
             }
         }
     }
-
+    // report error
     String::from("_")
 }
 
@@ -119,16 +121,14 @@ fn get_package_name() -> String {
 ///
 pub fn load_env_conf() -> Option<EnvConfig> {
     let mut path = String::new();
-    let types =  check_project_workspace();
-    
+    let types = check_project_workspace();
+
     if types.eq("workspace") {
         let package_name = get_package_name();
         path = format!("{}/src/resources/application.yml", package_name);
     } else if types.eq("project") {
         path = format!("src/resources/application.yml");
     }
-
-    println!("{}", path);
 
     let schema = yaml_from_str::<RootSchema>(&read_to_string(&path).unwrap_or_else(|_| {
         panic!(
@@ -157,17 +157,16 @@ pub fn load_env_conf() -> Option<EnvConfig> {
 /// action  dev 开始环境 test 测试环境 prod 生产环境
 ///
 pub fn load_global_config(action: String) -> Option<GlobalConfig> {
-
     let mut path = String::new();
-    let types =  check_project_workspace();
-    
+    let types = check_project_workspace();
+
     if types.eq("workspace") {
         let package_name = get_package_name();
         path = format!("{}/src/resources/application-{}.yml", package_name, &action);
     } else if types.eq("project") {
         path = format!("src/resources/application-{}.yml", &action);
     }
-    
+
     let schema = yaml_from_str::<RootSchema>(&read_to_string(&path).unwrap_or_else(|_| {
         panic!(
             "Error loading configuration file {}, please check the configuration!",
