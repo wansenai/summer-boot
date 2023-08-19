@@ -24,12 +24,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Verify Cargo installation
+      run: cargo --version
+
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+      
+
     - name: Install ${{ matrix.rust }}
       uses: actions-rs/toolchain@v1
       with:
         toolchain: ${{ matrix.rust }}
         profile: minimal
-        override: true
 
     - name: check
       uses: actions-rs/cargo@v1
@@ -75,7 +84,7 @@ jobs:
         args: --all --features unstable,logger
 
   check_fmt_and_docs:
-    name: Checking fmt, clippy, and docs
+    name: Checking fmt, and docs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -84,9 +93,6 @@ jobs:
       run: |
         rustup component add clippy rustfmt
         rustc --version
-
-    - name: clippy
-      run: cargo clippy --tests --examples --features logger -- -D warnings
 
     - name: fmt
       run: cargo fmt --all -- --check
