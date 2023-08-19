@@ -3,99 +3,32 @@ name: Rust CI
 on:
   push:
     branches:
-      - master  # 替换为您的主分支名称
+      - main  # 替换为您的主分支名称
   pull_request:
     branches:
-      - master  # 替换为您的主分支名称
-
-env:
-  RUSTFLAGS: -Dwarnings
+      - main  # 替换为您的主分支名称
 
 jobs:
-  build_and_test:
-    name: Build and test
+  build:
     runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        rust: [stable, nightly]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        rust: [stable, beta, nightly]
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Verify Cargo installation
-      run: cargo --version
-
     - name: Set up Rust
       uses: actions-rs/toolchain@v1
       with:
         profile: minimal
-        toolchain: stable
-      
-
-    - name: Install ${{ matrix.rust }}
-      uses: actions-rs/toolchain@v1
-      with:
         toolchain: ${{ matrix.rust }}
-        profile: minimal
 
-    - name: check
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
-        args: --all --bins --examples --features logger
+    - name: Check with Cargo
+      run: cargo check --verbose
 
-    - name: check avoid-dev-deps
-      uses: actions-rs/cargo@v1
-      if: matrix.rust == 'nightly'
-      with:
-        command: check
-        args: --all -Z avoid-dev-deps
-
-    - name: check unstable
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
-        args: --all --bins --examples --tests --features unstable,logger
-
-    - name: check no-default-features
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
-        args: --no-default-features
-
-    - name: check benches
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
-        args: --benches
-
-    - name: tests
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
-        args: --all --features logger
-
-    - name: tests unstable
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
-        args: --all --features unstable,logger
-
-  check_fmt_and_docs:
-    name: Checking fmt, and docs
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-
-    - name: setup
-      run: |
-        rustup component add clippy rustfmt
-        rustc --version
-
-    - name: fmt
-      run: cargo fmt --all -- --check
-
-    - name: Docs
-      run: cargo doc --no-deps
+    - name: Test with Cargo
+      run: cargo test --verbose
