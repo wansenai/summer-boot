@@ -1,5 +1,5 @@
 #[cfg(unix)]
-use async_std::os::unix::net::UnixListener;
+use super::UnixListener;
 use super::{ListenInfo, Listener, TcpListener};
 use crate::Server;
 

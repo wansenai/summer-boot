@@ -12,9 +12,21 @@ env:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        rust: [stable, nightly]
 
     steps:
+      - uses: actions/checkout@master
+
+      - name: Install ${{ matrix.rust }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          override: true
+
       - name: Set up Rust
         uses: actions/checkout@v3
         with:
@@ -23,14 +35,11 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Build and fmt and test 
+      - name: check and fmt and test 
         run: |
-          cargo build --verbose --target x86_64-unknown-linux-gnu
-          cargo fmt --verbose --target x86_64-unknown-linux-gnu
-          cargo test --verbose --target x86_64-unknown-linux-gnu
+          cargo check
+          cargo fmt --all -- --check
+          cargo test
 
-      - name: Build for Unix
-        if: runner.os == 'Linux'
-        run: |
-          cargo build --verbose --target x86_64-unknown-linux-gnu
-          cargo test --verbose --target x86_64-unknown-linux-gnu
+      - name: Docs
+        run: cargo doc --no-deps

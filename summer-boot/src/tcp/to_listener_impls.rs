@@ -1,5 +1,5 @@
 #[cfg(unix)]
-use async_std::os::unix::net::UnixListener;
+use UnixListener;
 use super::{ConcurrentListener, FailoverListener, ParsedListener, TcpListener, ToListener};
 use async_std::io;
 use http_types::url::Url;
