@@ -11,17 +11,18 @@
 //!
 //!
 
-use proc_macro::{TokenStream};
+use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::{quote, ToTokens};
 use serde::Deserialize;
-use std::{fs, fmt::format};
+use serde_json::Value;
 use std::io::Read;
+use std::path::Path;
+use std::{fmt::format, fs};
 use syn::{
-    parse_file, parse_macro_input, parse_quote, punctuated::Punctuated, Item, ItemFn, Lit, Meta,
-    NestedMeta, Token, Stmt, Pat, AttributeArgs
+    parse_file, parse_macro_input, parse_quote, punctuated::Punctuated, AttributeArgs, Item,
+    ItemFn, Lit, Meta, NestedMeta, Pat, Stmt, Token,
 };
-use serde_json::{Value};
 
 /// 用于匹配项目根目录下的 `Cargo.toml` 文件。
 /// 匹配规则为：
@@ -96,11 +97,13 @@ pub fn main(_: TokenStream, item: TokenStream) -> TokenStream {
 pub fn auto_scan(args: TokenStream, input: TokenStream) -> TokenStream {
     let mut project = Vec::<String>::new();
     let mut filter_paths = Vec::<String>::new();
-
     // 找到需要扫描的路径
-    let mut cargo_toml = fs::File::open("Cargo.toml").unwrap();
+    let mut cargo_toml = fs::File::open("Cargo.toml").expect("Cargo Toml文件找不到");
     let mut content = String::new();
-    cargo_toml.read_to_string(&mut content).unwrap();
+
+    cargo_toml
+        .read_to_string(&mut content)
+        .expect("Cargo内容为空");
 
     // 根据包类型分别处理
     if let Ok(conf_work_space) = toml::from_str::<ConfWorkSpace>(&content) {
@@ -120,27 +123,26 @@ pub fn auto_scan(args: TokenStream, input: TokenStream) -> TokenStream {
     // 解析宏信息
     let args = parse_macro_input!(args as AttributeArgs);
     for arg in args {
-            if let NestedMeta::Lit(Lit::Str(path)) = arg {
-                filter_paths.push(path.value());
-            }
+        if let NestedMeta::Lit(Lit::Str(project)) = arg {
+            filter_paths.push(project.value());
+        }
     }
 
     // 解析函数体
     let mut input = parse_macro_input!(input as ItemFn);
-    
+
     // 查找主函数的位置和是否存在变量名
     // 未找到则直接退出宏处理
     // 变量名不存在则默认添加app
     // 如果存在则会返回出来，供后续使用
     if let Some((master_index, master_name)) = scan_master_fn(&mut input) {
-
         // 解析yaml文件
         let mut listener_addr = String::from("0.0.0.0:");
         let mut app_context_path = String::from("");
         let config = summer_boot_autoconfigure::load_conf();
         if let Some(config) = config {
-            let read_server = serde_json::to_string(&config.server).unwrap();
-            let v: Value = serde_json::from_str(&read_server).unwrap();
+            let read_server = serde_json::to_string(&config.server).expect("读取服务配置文件失败");
+            let v: Value = serde_json::from_str(&read_server).expect("读取服务配置文件失败");
             let port = v["port"].to_string();
             let context_path = v["context_path"].to_string();
             listener_addr.push_str(&port);
@@ -149,12 +151,18 @@ pub fn auto_scan(args: TokenStream, input: TokenStream) -> TokenStream {
 
         // 开始扫描
         for path in project {
-            scan_method(&path, &filter_paths, &mut input, &app_context_path, (master_index, &master_name));
+            scan_method(
+                &path,
+                &filter_paths,
+                &mut input,
+                &app_context_path,
+                (master_index, &master_name),
+            );
         }
 
         // 配置listen
-        input.block.stmts.push(parse_quote!{
-            #master_name.listen(#listener_addr).await.unwrap();
+        input.block.stmts.push(parse_quote! {
+            #master_name.listen(#listener_addr).await.expect("配置listen失败");
         });
     }
 
@@ -191,11 +199,13 @@ fn scan_master_fn(input: &mut ItemFn) -> Option<(i32, Ident)> {
             // 函数不存在变量，需要手动添加
             // TODO 目前相对简单，删除当前函数，并添加指定的函数即可，后续建议修改
             input.block.stmts.remove(master_index as usize);
-            input.block.stmts.insert(master_index as usize, parse_quote!{
-                let mut app = summer_boot::run();
-            })
+            input.block.stmts.insert(
+                master_index as usize,
+                parse_quote! {
+                    let mut app = summer_boot::run();
+                },
+            )
         }
-
 
         Some((master_index, master_name))
     }
@@ -204,70 +214,81 @@ fn scan_master_fn(input: &mut ItemFn) -> Option<(i32, Ident)> {
 // 判断是否是目录，如果是路径则需要循环递归处理，
 // 如果是文件则直接处理
 // 处理过程中会将函数调用函数拼接，然后插入到指定的位置 下标+1 的位置
-fn scan_method(path: &str, filter_paths: &Vec<String>, input_token_stream: &mut ItemFn, context_path: &str, (mut master_index, master_name): (i32, &Ident)) {
-    let mut file = fs::File::open(path).unwrap();
-    let file_type = file.metadata().unwrap();
-    if file_type.is_dir() {
-        // 获取当前文件夹下的所有文件
-        let mut files = fs::read_dir(path).unwrap();
-
-        // 循环里面的所有文件
-        while let Some(file) = files.next() {
-            let file = file.unwrap();
-            scan_method(&file.path().to_str().unwrap(), filter_paths, input_token_stream, context_path, (master_index, master_name));
-        }
-    } else {
-        // 判断文件名后缀是否是.rs
-        if path.ends_with(".rs") {
-            // 判断是否需要过滤
-            if filter_paths.iter().any(|p| {
-                path.contains(p)
-            }) { return; }
-
-            // 如果是文件，则处理内部细节
-            let mut content = String::new();
-            file.read_to_string(&mut content).unwrap();
-
-            // 解析文件
-            let ast = parse_file(&content).unwrap();
-            let items = ast.items;
-            for item in items {
-                if let Item::Fn(item) = item {
-                    // 处理函数中的函数名，指定宏信息
-                    for attr in item.attrs {
-                        // 遍历所有宏信息
-                        if let Meta::List(meta) = attr.parse_meta().unwrap() {
-                            // 判断宏是否为指定的宏
-                            let attr_path = meta.path.to_token_stream().to_string();
-
-                            let method = config_req_type(&attr_path);
-                            if method.is_none() {
-                                continue;
+fn scan_method(
+    path: &str,
+    filter_paths: &Vec<String>,
+    input_token_stream: &mut ItemFn,
+    context_path: &str,
+    (mut master_index, master_name): (i32, &Ident),
+) {
+    if let Ok(entries) = fs::read_dir(path) {
+        for entry in entries {
+            if let Ok(entry) = entry {
+                let file_path = entry.path();
+                if file_path.is_file() {
+                    if let Some(extension) = file_path.extension() {
+                        if extension == "rs" {
+                            if filter_paths.iter().any(|p| path.contains(p)) {
+                                return;
                             }
-                            let method = method.unwrap().to_token_stream();
+                            // 如果是文件，则处理内部细节
+                            let content = fs::read_to_string(entry.path()).expect("处理内部细节");
+                            // 解析文件
+                            let ast = parse_file(&content).expect("解析文件失败");
+                            let items = ast.items;
+                            for item in items {
+                                if let Item::Fn(item) = item {
+                                    // 处理函数中的函数名，指定宏信息
+                                    for attr in item.attrs {
+                                        // 遍历所有宏信息
+                                        if let Meta::List(meta) =
+                                            attr.parse_meta().expect("所有所有宏信息")
+                                        {
+                                            // 判断宏是否为指定的宏
+                                            let attr_path = meta.path.to_token_stream().to_string();
 
-                            // 获取函数全路径名
-                            let fn_name = &item.sig.ident.to_string();
-                            let fn_path_token_stream = config_function_path(&path, fn_name);
+                                            let method = config_req_type(&attr_path);
+                                            if method.is_none() {
+                                                continue;
+                                            }
+                                            let method =
+                                                method.expect("是否为指定的宏").to_token_stream();
 
-                            // 如果是 summer_boot 的宏信息，则处理
-                            let attr_url = meta.nested.into_iter().next().unwrap();
-                            if let NestedMeta::Lit(Lit::Str(url)) = attr_url {
-                                let url = url.value();
-                                let url = format!("{}{}", context_path, url).replace("\"", "").replace("//", "/");
+                                            // 获取函数全路径名
+                                            let fn_name: &String = &item.sig.ident.to_string();
+                                            let fn_path_token_stream = config_function_path(
+                                                &file_path.to_str().unwrap_or("文件为空"),
+                                                fn_name,
+                                            );
 
-                                if input_token_stream.block.stmts.len() < 1 {
-                                    // 如果注入的方法中没有任何代码，则不操作
-                                    break;
-                                } else {
-                                    // 添加，注意下标加 1
-                                    master_index += 1;
-                                    input_token_stream.block.stmts.insert(
-                                        master_index as usize,
-                                        parse_quote! {
-                                            #master_name.at(#url).#method(#fn_path_token_stream);
-                                        },
-                                    );
+                                            // 如果是 summer_boot 的宏信息，则处理
+                                            let attr_url = meta
+                                                .nested
+                                                .into_iter()
+                                                .next()
+                                                .expect("summer_boot 的宏信息");
+                                            if let NestedMeta::Lit(Lit::Str(url)) = attr_url {
+                                                let url = url.value();
+                                                let url = format!("{}{}", context_path, url)
+                                                    .replace("\"", "")
+                                                    .replace("//", "/");
+
+                                                if input_token_stream.block.stmts.len() < 1 {
+                                                    // 如果注入的方法中没有任何代码，则不操作
+                                                    break;
+                                                } else {
+                                                    // 添加，注意下标加 1
+                                                    master_index += 1;
+                                                    input_token_stream.block.stmts.insert(
+                                                    master_index as usize,
+                                                    parse_quote! {
+                                                        #master_name.at(#url).#method(#fn_path_token_stream);
+                                                    },
+                                                );
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -286,7 +307,8 @@ fn config_function_path(path: &str, fu_name: &str) -> proc_macro2::TokenStream {
     fn_path_idents.push(Ident::new("crate", Span::call_site()));
 
     // 配置函数路径
-    let names: Vec<&str> = (&path[path.find("src/").unwrap() + 4..path.rfind(".rs").unwrap()])
+    let names: Vec<&str> = path
+        [path.find("src").expect("转换src") + 4..path.rfind(".rs").expect("转换rs后缀")]
         .split("/")
         .collect();
 

@@ -1,12 +1,12 @@
 pub mod common;
 pub mod log;
 
-pub mod utils;
+mod context;
+mod gateway;
 mod http1;
 mod server;
-mod gateway;
 mod tcp;
-mod context;
+pub mod utils;
 
 pub use http1::http;
 pub use utils::middleware::{Middleware, Next};
@@ -15,9 +15,9 @@ pub use utils::response::Response;
 pub use utils::response_builder::ResponseBuilder;
 pub use utils::util;
 
-pub use server::endpoint::Endpoint;
 pub use gateway::route::Route;
 pub use http_types::{self, Body, Error, Status, StatusCode};
+pub use server::endpoint::Endpoint;
 
 use server::server::Server;
 

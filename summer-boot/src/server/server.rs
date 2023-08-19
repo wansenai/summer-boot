@@ -1,10 +1,10 @@
 //! HTTP server
+use super::endpoint::Endpoint;
 use crate::gateway;
 use crate::log;
 use crate::tcp;
 use crate::utils;
 use crate::{Request, Route};
-use super::endpoint::Endpoint;
 
 use async_std::io;
 use async_std::sync::Arc;
@@ -192,8 +192,7 @@ where
         M: Middleware<State>,
     {
         log::trace!("正在添加中间件 {}", middleware.name());
-        let m = Arc::get_mut(&mut self.middleware)
-            .expect("服务器启动后无法注册中间件");
+        let m = Arc::get_mut(&mut self.middleware).expect("服务器启动后无法注册中间件");
         m.push(Arc::new(middleware));
         self
     }

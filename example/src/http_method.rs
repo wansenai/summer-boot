@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use summer_boot::{Request, Result};
 
-#[derive(Debug, Deserialize)]       
+#[derive(Debug, Deserialize)]
 struct User {
     name: String,
     age: u16,
