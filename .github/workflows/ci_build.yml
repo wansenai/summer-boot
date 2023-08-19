@@ -3,10 +3,10 @@ name: Rust CI
 on:
   push:
     branches:
-      - main  # 替换为您的主分支名称
+      - master  # 替换为您的主分支名称
   pull_request:
     branches:
-      - main  # 替换为您的主分支名称
+      - master  # 替换为您的主分支名称
 
 jobs:
   build:
