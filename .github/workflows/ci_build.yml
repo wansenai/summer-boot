@@ -1,10 +1,12 @@
 name: Rust CI
 
 on:
-  pull_request:
   push:
     branches:
-      - master
+      - master  # 替换为您的主分支名称
+  pull_request:
+    branches:
+      - master 
 
 env:
   RUSTFLAGS: -Dwarnings
