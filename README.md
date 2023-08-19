@@ -32,10 +32,6 @@
 
 <br />
 
-Due to various reasons, we will no longer maintain it. 
-
-If you have any ideas, feel free to contact us at any time Jameszow@wansen.email
-
 ------
 Encapsulating tide, combined with the design principles of spring boot.
 will simplify web development and enable developers to focus more on business API development.
@@ -50,7 +46,7 @@ summer_boot::log
    ____) | |_| | | | | | | | | | | |  __/ |    | |_) | (_) | (_) | |_ 
   |_____/ \__,_|_| |_| |_|_| |_| |_|\___|_|    |____/ \___/ \___/ \__|
                                                                       
-  :: Summer Boot Version::             (1.0.0)                                                                    
+  :: Summer Boot Version::             (1.0.3)                                                                    
  
 summer_boot::server::server Server listening on http://127.0.0.1:8080
 ```
@@ -59,7 +55,7 @@ summer_boot::server::server Server listening on http://127.0.0.1:8080
 
 Cargo.toml:
 ```rust
-summer-boot = "1.0.0"
+summer-boot = "1.0.3"
 ```
 
 Add resuorce configuration file to src directory
