@@ -15,10 +15,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose
-    - name: Fmt
-      run: cargo fmt --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      - name: Set up Rust
+        uses: actions/setup-rust@v1
+        with:
+          rust-version: stable
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Build and fmt and test 
+        run: |
+          cargo build --verbose
+          cargo fmt --verbose
+          cargo test --verbose
+
+      - name: Build for Unix
+        if: runner.os == 'Linux'
+        run: |
+          cargo build --verbose --target x86_64-unknown-linux-gnu
+          cargo test --verbose --target x86_64-unknown-linux-gnu
