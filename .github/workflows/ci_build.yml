@@ -6,7 +6,7 @@ on:
       - master  # 替换为您的主分支名称
   pull_request:
     branches:
-      - master 
+      - master  # 替换为您的主分支名称
 
 env:
   RUSTFLAGS: -Dwarnings
@@ -14,11 +14,6 @@ env:
 jobs:
   build_and_test:
     name: Build and test
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -26,7 +21,8 @@ jobs:
         rust: [stable, nightly]
 
     steps:
-    - uses: actions/checkout@master
+    - name: Checkout code
+      uses: actions/checkout@v3
 
     - name: Install ${{ matrix.rust }}
       uses: actions-rs/toolchain@v1
