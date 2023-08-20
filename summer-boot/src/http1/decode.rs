@@ -110,8 +110,20 @@ fn overflow() -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, "Chunk size overflowed 64 bits")
 }
 
+///
+/// 实现了Read trait 的结构体ChunkedDecoder方法的poll_read实现
+/// 它用于从一个Read类型的输入流中读取数据，并解析出分块编码（chunked encoding）的数据。
+/// 
+/// State::ChunkSize：在这个状态下，代码读取一个字节，并根据字节的值计算出当前块的大小。
+/// State::ChunkSizeExpectLf：在这个状态下，代码期望读取到一个换行符（LF），如果当前块的大小为0，则进入State::Trailers状态，否则进入State::ChunkBody状态。
+/// State::ChunkBody：在这个状态下，代码读取当前块的数据，并将读取的字节数返回。
+/// State::ChunkBodyExpectCr：在这个状态下，代码期望读取到一个回车符（CR）。
+/// State::ChunkBodyExpectLf：在这个状态下，代码期望读取到一个换行符（LF），并进入State::ChunkSize状态。
+/// State::Trailers：在这个状态下，代码读取剩余的数据作为 trailers，并解析出 trailers 的头部字段。
+/// State::TrailerSending：在这个状态下，代码等待 trailers 发送完成。
+/// State::Done：在这个状态下，代码表示读取操作已完成。
+/// 
 impl<R: Read + Unpin> Read for ChunkedDecoder<R> {
-    #[allow(missing_doc_code_examples)]
     fn poll_read(
         mut self: Pin<&mut Self>,
         cx: &mut Context<'_>,
