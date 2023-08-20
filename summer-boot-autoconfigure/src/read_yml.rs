@@ -2,11 +2,9 @@ use schemars::schema::RootSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str as json_from_str, to_string_pretty};
 use serde_yaml::from_str as yaml_from_str;
-use std::path::Path;
 use std::{
     fs::{self, read_to_string},
-    io::Read,
-    ops::Add,
+    io::Read
 };
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -74,7 +72,7 @@ fn check_project_workspace() -> String {
 
     // 根据包类型分别处理
     if let Ok(conf_work_space) = toml::from_str::<ConfWorkSpace>(&content) {
-        if let Some(workspace) = conf_work_space.workspace {
+        if let Some(_) = conf_work_space.workspace {
             types.push_str("workspace");
         } else {
             types.push_str("project");

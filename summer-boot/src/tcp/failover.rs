@@ -13,6 +13,7 @@ pub struct FailoverListener<State> {
     index: Option<usize>,
 }
 
+#[allow(dead_code)]
 impl<State> FailoverListener<State>
 where
     State: Clone + Send + Sync + 'static,
