@@ -32,7 +32,6 @@
 
 <br />
 
-------
 Encapsulating tide, combined with the design principles of spring boot.
 will simplify web development and enable developers to focus more on business API development.
 
