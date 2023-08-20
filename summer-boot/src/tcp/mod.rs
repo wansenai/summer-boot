@@ -21,7 +21,7 @@ pub use to_listener::ToListener;
 
 pub(crate) use parsed::ParsedListener;
 pub(crate) use tcp_listener::TcpListener;
-#[cf(gunix)]
+#[cfg(unix)]
 pub(crate) use unix::UnixListener;
 
 #[macro_export]
