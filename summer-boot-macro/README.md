@@ -5,7 +5,7 @@ Used to write all macros of summer boot
 ## Getting Started
 
 ```rust
-summer-boot-macro = "1.0.0"
+summer-boot-macro = "1.4.0"
 ```
 
 ## Macro description

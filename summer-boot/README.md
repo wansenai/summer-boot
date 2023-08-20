@@ -16,16 +16,16 @@ summer_boot::log
    ____) | |_| | | | | | | | | | | |  __/ |    | |_) | (_) | (_) | |_ 
   |_____/ \__,_|_| |_| |_|_| |_| |_|\___|_|    |____/ \___/ \___/ \__|
                                                                       
-  :: Summer Boot Version::             (1.0.0)                                                                    
+  :: Summer Boot Version::             (1.4.0)                                                                    
  
-summer_boot::web2::server::server Server listening on http://127.0.0.1:8080
+summer_boot::web2::server::server Server listening on http://0.0.0.0:8080
 ```
 
 ## Quick Start
 
 Cargo.toml:
 ```rust
-summer-boot = "1.0.0"
+summer-boot = "1.4.0"
 ```
 
 Add resuorce configuration file to src directory
