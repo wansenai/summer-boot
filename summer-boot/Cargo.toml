@@ -16,7 +16,7 @@ repository = "https://github.com/summer-os/summer-boot"
 homepage = "https://summeros.io/"
 
 [features]
-default = ["macros"]
+default = ["macros", "async-h1"]
 macros = [
     "summer-boot-macro"
 ]
@@ -33,6 +33,7 @@ async-std = { version = "1.8.0", features = ["attributes"] }
 async-trait = "0.1.41"
 async-channel = "1.5.1"
 async-dup = "1.2.2"
+async-h1 = { version = "2.3.0", optional = true }
 
 #pin
 pin-project = "1.0.2"
