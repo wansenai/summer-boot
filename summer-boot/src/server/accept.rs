@@ -28,6 +28,7 @@ pub trait Accept {
 /// 使用轮询函数创建一个 `Accept` 。
 /// # Example
 ///
+#[allow(dead_code)]
 pub fn poll_fn<F, IO, E>(func: F) -> impl Accept<Conn = IO, Error = E>
 where
     F: FnMut(&mut task::Context<'_>) -> Poll<Option<Result<IO, E>>>,

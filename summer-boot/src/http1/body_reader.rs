@@ -5,6 +5,7 @@ use async_std::io::{BufReader, Read, Take};
 use async_std::task::{Context, Poll};
 use std::{fmt::Debug, io, pin::Pin};
 
+#[allow(dead_code)]
 pub enum BodyReader<IO: Read + Unpin> {
     Chunked(Arc<Mutex<ChunkedDecoder<BufReader<IO>>>>),
     Fixed(Arc<Mutex<Take<BufReader<IO>>>>),

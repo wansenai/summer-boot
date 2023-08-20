@@ -78,6 +78,7 @@ pub(crate) fn is_transient_error(e: &io::Error) -> bool {
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct ListenInfo {
     conn_string: String,
     transport: String,
@@ -93,14 +94,17 @@ impl ListenInfo {
         }
     }
 
+    #[allow(dead_code)]
     pub fn connection(&self) -> &str {
         self.conn_string.as_str()
     }
 
+    #[allow(dead_code)]
     pub fn transport(&self) -> &str {
         self.transport.as_str()
     }
 
+    #[allow(dead_code)]
     pub fn is_encrypted(&self) -> bool {
         self.tls
     }

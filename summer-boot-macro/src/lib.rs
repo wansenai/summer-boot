@@ -17,8 +17,7 @@ use quote::{quote, ToTokens};
 use serde::Deserialize;
 use serde_json::Value;
 use std::io::Read;
-use std::path::Path;
-use std::{fmt::format, fs};
+use std::fs;
 use syn::{
     parse_file, parse_macro_input, parse_quote, punctuated::Punctuated, AttributeArgs, Item,
     ItemFn, Lit, Meta, NestedMeta, Pat, Stmt, Token,
@@ -43,6 +42,7 @@ struct Member {
 /// 匹配package下的name字段
 #[derive(Debug, Deserialize)]
 struct Name {
+    #[allow(dead_code)]
     name: String,
 }
 

@@ -7,8 +7,7 @@ use async_std::io::{self, Cursor, Read};
 use async_std::task::{Context, Poll};
 use futures_util::ready;
 use http_types::headers::{CONTENT_LENGTH, DATE, TRANSFER_ENCODING};
-use http_types::{Body, Method, Response};
-use pin_project::pin_project;
+use http_types::{Method, Response};
 
 use super::body_encoder::BodyEncoder;
 use super::date::fmt_http_date;
