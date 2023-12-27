@@ -36,7 +36,7 @@ pub struct EnvConfig {
 加载环境配置
  */
 pub fn load_env_conf() -> Option<EnvConfig> {
-    let path = format!("src/resources/application.yml");
+    let path = "src/resources/application.yml".to_string();
     let schema = yaml_from_str::<RootSchema>(&read_to_string(&path).unwrap_or_else(|_| {
         panic!(
             "Error loading configuration file {}, please check the configuration!",
@@ -127,5 +127,23 @@ mod tests {
                 println!("文件 {} 不存在于目录 {}", file_name, directory);
             }
         }
+    }
+
+    #[test]
+    fn test_load_global_config() {
+        let pro = load_global_config("dev".to_string());
+        println!("{:?}", pro);
+        pro.as_ref().map(|a| {
+            println!("mysqlConfig:{}", serde_json::to_string(&a.mysql).unwrap());
+        });
+    }
+
+    #[test]
+    fn test_load_conf() {
+        let pro = load_conf();
+        println!("{:?}", pro);
+        pro.as_ref().map(|a| {
+            println!("mysqlConfig:{}", serde_json::to_string(&a.mysql).unwrap());
+        });
     }
 }
