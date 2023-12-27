@@ -1,7 +1,7 @@
 use super::{is_transient_error, ListenInfo};
 
 use super::Listener;
-use crate::Server;
+use crate::{http1, Server};
 
 use std::fmt::{self, Display, Formatter};
 
@@ -42,8 +42,7 @@ fn handle_unix<State: Clone + Send + Sync + 'static>(app: Server<State>, stream:
     task::spawn(async move {
         let local_addr = unix_socket_addr_to_string(stream.local_addr());
         let peer_addr = unix_socket_addr_to_string(stream.peer_addr());
-
-        let fut = async_h1::accept(stream, |mut req| async {
+        let fut = http1::http::accept(stream, |mut req| async {
             req.set_local_addr(local_addr.as_ref());
             req.set_peer_addr(peer_addr.as_ref());
             app.respond(req).await
