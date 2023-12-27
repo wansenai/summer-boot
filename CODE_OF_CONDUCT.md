@@ -4,4 +4,4 @@ The summer boot project adheres to the [Rust Code of Conduct](https://www.rust-l
 
 ## Enforcement
 
-Instances of violations of the Code of Conduct can be reported by contacting the project team at [team@summeros.org](mailto:team@summeros.org).
+Instances of violations of the Code of Conduct can be reported by contacting the project team at [team@wansenai.com](mailto:team@wansenai.com).
