@@ -110,4 +110,22 @@ mod tests {
             println!("mysqlConfig:{}", serde_json::to_string(&a.mysql).unwrap());
         });
     }
+
+    #[test]
+    fn load_env_file_test() {
+        //  let file = File::open("example/src/resources").expect("找不到文件");
+        let file_name = "application.yml";
+        let directories = vec!["src/resources", "spring-boot/src/resources", "dir3"];
+
+        for directory in directories {
+            let path = format!("{}/{}", directory, file_name);
+            let file_exists = std::fs::metadata(&path).is_ok();
+
+            if file_exists {
+                println!("文件 {} 存在于目录 {}", file_name, directory);
+            } else {
+                println!("文件 {} 不存在于目录 {}", file_name, directory);
+            }
+        }
+    }
 }
