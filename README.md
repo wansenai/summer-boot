@@ -23,10 +23,14 @@
     <img src="https://bors.tech/images/badge_small.svg"
       alt="ors enabled" />
   </a>
+  <a href="https://rust-lang.org/">
+    <img src="https://img.shields.io/badge/Rust-1.74-red?logo=rust"
+      alt="rust version" />
+  </a>
   <!-- fossa status -->
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot?ref=badge_shield">
-    <img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsummer-os%2Fsummer-boot.svg?type=shield"
-      alt="ors enabled" />
+    <img src="https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-Green"
+      alt="license" />
   </a>
 </div>
 
