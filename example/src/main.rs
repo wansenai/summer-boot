@@ -2,7 +2,6 @@ use serde::Deserialize;
 use summer_boot::{Request, Result};
 
 mod http_method;
-mod test;
 
 #[derive(Debug, Deserialize)]
 struct User {

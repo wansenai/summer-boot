@@ -8,8 +8,8 @@ struct User {
 }
 
 #[summer_boot::get("/hello")]
-pub async fn hello(mut _req: Request<()>) -> Result {
-    Ok(format!("Hello, Summer Boot").into())
+pub async fn hello(_req: Request<()>) -> Result {
+    Ok("Hello, Summer Boot".to_string().into())
 }
 
 #[summer_boot::post("/user/getUserInfo")]
