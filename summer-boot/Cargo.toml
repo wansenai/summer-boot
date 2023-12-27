@@ -1,6 +1,6 @@
 [package]
 name = "summer-boot"
-version = "1.4.1"
+version = "1.4.2"
 rust-version = "1.73.0"
 edition = "2021"
 description = "summer boot"
