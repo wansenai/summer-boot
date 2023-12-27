@@ -1,19 +1,19 @@
 [package]
 name = "summer-boot-macro"
-version = "1.4.0"
-rust-version = "1.60.0"
+version = "1.4.1"
+rust-version = "1.73.0"
 edition = "2021"
 description = "summer boot macro"
 license = "Apache-2.0"
 authors = [
     "James Zow <Jameszow@163.com>",
     "Yangandmore <635408602@qq.com>",
-    "Summeros Team <team@summeros.org>"
+    "WanSen AI Team <team@wansenai.com>"
 ]
 readme = "README.md"
-documentation = "https://github.com/summer-os/summer-boot/blob/master/summer-boot-macro/README.md"
-repository = "https://github.com/summer-os/summer-boot"
-homepage = "https://summeros.io/"
+documentation = "https://github.com/wansenai/summer-boot#readme"
+repository = "https://github.com/wansenai/summer-boot"
+homepage = "https://crates.io/crates/summer-boot"
 
 [lib]
 proc-macro = true
@@ -25,7 +25,7 @@ syn = { version = "1.0", features = ["full"] }
 toml = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-summer-boot-autoconfigure = { version = "1.4", path = "../summer-boot-autoconfigure"}
+summer-boot-autoconfigure = { version = "1.4.1", path = "../summer-boot-autoconfigure"}
 
 [dev-dependencies]
-summer-boot = { version = "1.4", path = "../summer-boot" }
+summer-boot = { version = "1.4.1", path = "../summer-boot" }

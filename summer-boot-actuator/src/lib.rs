@@ -1,1 +1,1 @@
-
+mod configuration_properties;

@@ -49,7 +49,7 @@ summer_boot::log
    ____) | |_| | | | | | | | | | | |  __/ |    | |_) | (_) | (_) | |_ 
   |_____/ \__,_|_| |_| |_|_| |_| |_|\___|_|    |____/ \___/ \___/ \__|
                                                                       
-  :: Summer Boot Version::             (1.4.0)                                                                    
+  :: Summer Boot Version::             (1.4.2)                                                                    
  
 summer_boot::server::server Server listening on http://0.0.0.0:8080
 ```
@@ -58,7 +58,7 @@ summer_boot::server::server Server listening on http://0.0.0.0:8080
 
 Cargo.toml:
 ```rust
-summer-boot = "1.4.0"
+summer-boot = "1.4.2"
 ```
 
 Add resuorce configuration file to src directory

@@ -1,22 +1,22 @@
 [package]
 name = "summer-boot"
-version = "1.4.0"
-rust-version = "1.60.0"
+version = "1.4.2"
+rust-version = "1.73.0"
 edition = "2021"
 description = "summer boot"
 authors = [
     "James Zow <Jameszow@163.com>",
-    "Summeros Team <team@summeros.org>"
+    "WanSen AI Team <team@wansenai.com>"
 ]
 license = "Apache-2.0"
 readme = "README.md"
 keywords = ["tcp", "http", "web", "summer"]
-documentation = "https://github.com/summer-os/summer-boot#readme"
-repository = "https://github.com/summer-os/summer-boot"
-homepage = "https://summeros.io/"
+documentation = "https://github.com/wansenai/summer-boot#readme"
+repository = "https://github.com/wansenai/summer-boot"
+homepage = "https://crates.io/crates/summer-boot"
 
 [features]
-default = ["macros", "async-h1"]
+default = ["macros"]
 macros = [
     "summer-boot-macro"
 ]
@@ -33,7 +33,6 @@ async-std = { version = "1.8.0", features = ["attributes"] }
 async-trait = "0.1.41"
 async-channel = "1.5.1"
 async-dup = "1.2.2"
-async-h1 = { version = "2.3.0", optional = true }
 
 #pin
 pin-project = "1.0.2"
@@ -46,7 +45,7 @@ futures-util = "0.3.6"
 
 
 # summer dependencies
-summer-boot-macro = { version = "1.4" , optional = true, path = "../summer-boot-macro"}
+summer-boot-macro = { version = "1.4.1" , optional = true, path = "../summer-boot-macro"}
 
 #log
 femme = { version = "2.1.1"}
