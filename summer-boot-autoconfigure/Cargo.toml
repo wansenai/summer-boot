@@ -1,20 +1,20 @@
 [package]
 name = "summer-boot-autoconfigure"
-version = "1.4.0"
-rust-version = "1.60.0"
+version = "1.4.1"
+rust-version = "1.73.0"
 edition = "2021"
 description = "summer boot autoconfigure"
 authors = [
     "James Zow <Jameszow@163.com>",
     "Xinyu Gao <barrybivinsxinyu@gmail.com>",
-    "Summeros Team <team@summeros.org>"
+    "WanSen AI Team <team@wansenai.com>"
 ]
 license = "Apache-2.0"
 readme = "README.md"
 keywords = ["middleware", "autoconfigure", "summer"]
-documentation = "https://github.com/summer-os/summer-boot/summer-boot-autoconfigure/#readme"
-repository = "https://github.com/summer-os/summer-boot"
-homepage = "https://summeros.io/"
+documentation = "https://github.com/wansenai/summer-boot#readme"
+repository = "https://github.com/wansenai/summer-boot"
+homepage = "https://crates.io/crates/summer-boot"
 
 
 [dependencies]
